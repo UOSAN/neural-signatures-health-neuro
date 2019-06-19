@@ -1,0 +1,400 @@
+DEV048 beta_0001.nii logistic_map.nii.gz 21.3551
+DEV048 beta_0001.nii reg_look_train.nii.gz 388430
+DEV048 beta_0001.nii reg_train.nii.gz 23666.6
+DEV048 beta_0001.nii ridge_map.nii.gz 1.92231
+DEV048 beta_0001.nii svm_map.nii.gz 2.1995
+DEV048 beta_0002.nii logistic_map.nii.gz 17.967
+DEV048 beta_0002.nii reg_look_train.nii.gz 88328.5
+DEV048 beta_0002.nii reg_train.nii.gz 75672.6
+DEV048 beta_0002.nii ridge_map.nii.gz 1.63944
+DEV048 beta_0002.nii svm_map.nii.gz 1.77182
+DEV048 beta_0003.nii logistic_map.nii.gz -2.64453
+DEV048 beta_0003.nii reg_look_train.nii.gz 56874.1
+DEV048 beta_0003.nii reg_train.nii.gz 126613
+DEV048 beta_0003.nii ridge_map.nii.gz -0.265186
+DEV048 beta_0003.nii svm_map.nii.gz -0.273029
+DEV048 beta_0004.nii logistic_map.nii.gz -0.48033
+DEV048 beta_0004.nii reg_look_train.nii.gz 136677
+DEV048 beta_0004.nii reg_train.nii.gz 75998.4
+DEV048 beta_0004.nii ridge_map.nii.gz -0.0253372
+DEV048 beta_0004.nii svm_map.nii.gz -0.11397
+DEV048 beta_0005.nii logistic_map.nii.gz -3.89122
+DEV048 beta_0005.nii reg_look_train.nii.gz 199346
+DEV048 beta_0005.nii reg_train.nii.gz 131182
+DEV048 beta_0005.nii ridge_map.nii.gz -0.65602
+DEV048 beta_0005.nii svm_map.nii.gz -0.44481
+DEV048 beta_0006.nii logistic_map.nii.gz -1.31904
+DEV048 beta_0006.nii reg_look_train.nii.gz 223956
+DEV048 beta_0006.nii reg_train.nii.gz 52728.3
+DEV048 beta_0006.nii ridge_map.nii.gz -0.219999
+DEV048 beta_0006.nii svm_map.nii.gz -0.0435617
+DEV048 beta_0007.nii logistic_map.nii.gz -12.5367
+DEV048 beta_0007.nii reg_look_train.nii.gz 130693
+DEV048 beta_0007.nii reg_train.nii.gz 12550.3
+DEV048 beta_0007.nii ridge_map.nii.gz -1.36504
+DEV048 beta_0007.nii svm_map.nii.gz -1.3768
+DEV048 beta_0008.nii logistic_map.nii.gz 3.26825
+DEV048 beta_0008.nii reg_look_train.nii.gz -180470
+DEV048 beta_0008.nii reg_train.nii.gz 130030
+DEV048 beta_0008.nii ridge_map.nii.gz 0.202965
+DEV048 beta_0008.nii svm_map.nii.gz 0.546118
+DEV048 beta_0009.nii logistic_map.nii.gz 6.4459
+DEV048 beta_0009.nii reg_look_train.nii.gz -19776.1
+DEV048 beta_0009.nii reg_train.nii.gz 62186.2
+DEV048 beta_0009.nii ridge_map.nii.gz 0.509874
+DEV048 beta_0009.nii svm_map.nii.gz 0.927008
+DEV048 beta_0010.nii logistic_map.nii.gz -0.613816
+DEV048 beta_0010.nii reg_look_train.nii.gz 135728
+DEV048 beta_0010.nii reg_train.nii.gz 119942
+DEV048 beta_0010.nii ridge_map.nii.gz -0.0430362
+DEV048 beta_0010.nii svm_map.nii.gz -0.0605023
+DEV048 beta_0011.nii logistic_map.nii.gz 12.8541
+DEV048 beta_0011.nii reg_look_train.nii.gz 186785
+DEV048 beta_0011.nii reg_train.nii.gz 166580
+DEV048 beta_0011.nii ridge_map.nii.gz 0.770016
+DEV048 beta_0011.nii svm_map.nii.gz 1.3904
+DEV048 beta_0012.nii logistic_map.nii.gz -6.72972
+DEV048 beta_0012.nii reg_look_train.nii.gz 33236.2
+DEV048 beta_0012.nii reg_train.nii.gz 130599
+DEV048 beta_0012.nii ridge_map.nii.gz -0.851386
+DEV048 beta_0012.nii svm_map.nii.gz -0.633358
+DEV048 beta_0013.nii logistic_map.nii.gz -4.34222
+DEV048 beta_0013.nii reg_look_train.nii.gz 43101.4
+DEV048 beta_0013.nii reg_train.nii.gz 60191.3
+DEV048 beta_0013.nii ridge_map.nii.gz -0.423812
+DEV048 beta_0013.nii svm_map.nii.gz -0.580508
+DEV048 beta_0014.nii logistic_map.nii.gz 5.72327
+DEV048 beta_0014.nii reg_look_train.nii.gz -73831.4
+DEV048 beta_0014.nii reg_train.nii.gz 55002.5
+DEV048 beta_0014.nii ridge_map.nii.gz 0.449172
+DEV048 beta_0014.nii svm_map.nii.gz 0.669679
+DEV048 beta_0015.nii logistic_map.nii.gz -16.5516
+DEV048 beta_0015.nii reg_look_train.nii.gz -122061
+DEV048 beta_0015.nii reg_train.nii.gz 87525
+DEV048 beta_0015.nii ridge_map.nii.gz -1.20412
+DEV048 beta_0015.nii svm_map.nii.gz -1.76484
+DEV048 beta_0016.nii logistic_map.nii.gz -12.4567
+DEV048 beta_0016.nii reg_look_train.nii.gz -122918
+DEV048 beta_0016.nii reg_train.nii.gz 77140.7
+DEV048 beta_0016.nii ridge_map.nii.gz -1.12452
+DEV048 beta_0016.nii svm_map.nii.gz -1.30926
+DEV048 beta_0017.nii logistic_map.nii.gz -6.54949
+DEV048 beta_0017.nii reg_look_train.nii.gz -72962.2
+DEV048 beta_0017.nii reg_train.nii.gz 113611
+DEV048 beta_0017.nii ridge_map.nii.gz -0.424062
+DEV048 beta_0017.nii svm_map.nii.gz -0.800085
+DEV048 beta_0018.nii logistic_map.nii.gz 0.0102677
+DEV048 beta_0018.nii reg_look_train.nii.gz -204227
+DEV048 beta_0018.nii reg_train.nii.gz 116451
+DEV048 beta_0018.nii ridge_map.nii.gz 0.523009
+DEV048 beta_0018.nii svm_map.nii.gz -0.000732381
+DEV048 beta_0019.nii logistic_map.nii.gz 14.9104
+DEV048 beta_0019.nii reg_look_train.nii.gz 97895.4
+DEV048 beta_0019.nii reg_train.nii.gz 76708.7
+DEV048 beta_0019.nii ridge_map.nii.gz 1.41434
+DEV048 beta_0019.nii svm_map.nii.gz 1.53451
+DEV048 beta_0020.nii logistic_map.nii.gz 13.1322
+DEV048 beta_0020.nii reg_look_train.nii.gz 111353
+DEV048 beta_0020.nii reg_train.nii.gz 76526.1
+DEV048 beta_0020.nii ridge_map.nii.gz 1.37324
+DEV048 beta_0020.nii svm_map.nii.gz 1.34748
+DEV048 beta_0028.nii logistic_map.nii.gz -8.67929
+DEV048 beta_0028.nii reg_look_train.nii.gz -210724
+DEV048 beta_0028.nii reg_train.nii.gz 120467
+DEV048 beta_0028.nii ridge_map.nii.gz -0.643836
+DEV048 beta_0028.nii svm_map.nii.gz -0.826835
+DEV048 beta_0029.nii logistic_map.nii.gz 7.20143
+DEV048 beta_0029.nii reg_look_train.nii.gz 26136.8
+DEV048 beta_0029.nii reg_train.nii.gz 115341
+DEV048 beta_0029.nii ridge_map.nii.gz 0.863692
+DEV048 beta_0029.nii svm_map.nii.gz 0.991008
+DEV048 beta_0030.nii logistic_map.nii.gz -3.35441
+DEV048 beta_0030.nii reg_look_train.nii.gz -68014.4
+DEV048 beta_0030.nii reg_train.nii.gz 75492
+DEV048 beta_0030.nii ridge_map.nii.gz -0.358439
+DEV048 beta_0030.nii svm_map.nii.gz -0.478857
+DEV048 beta_0031.nii logistic_map.nii.gz -4.02464
+DEV048 beta_0031.nii reg_look_train.nii.gz -117570
+DEV048 beta_0031.nii reg_train.nii.gz 128150
+DEV048 beta_0031.nii ridge_map.nii.gz -0.484239
+DEV048 beta_0031.nii svm_map.nii.gz -0.632494
+DEV048 beta_0032.nii logistic_map.nii.gz 11.3603
+DEV048 beta_0032.nii reg_look_train.nii.gz -13649.6
+DEV048 beta_0032.nii reg_train.nii.gz 50199.3
+DEV048 beta_0032.nii ridge_map.nii.gz 1.01738
+DEV048 beta_0032.nii svm_map.nii.gz 1.06937
+DEV048 beta_0033.nii logistic_map.nii.gz 3.39321
+DEV048 beta_0033.nii reg_look_train.nii.gz 102554
+DEV048 beta_0033.nii reg_train.nii.gz 120361
+DEV048 beta_0033.nii ridge_map.nii.gz 0.175495
+DEV048 beta_0033.nii svm_map.nii.gz 0.343036
+DEV048 beta_0034.nii logistic_map.nii.gz -7.16531
+DEV048 beta_0034.nii reg_look_train.nii.gz -163428
+DEV048 beta_0034.nii reg_train.nii.gz 61564.3
+DEV048 beta_0034.nii ridge_map.nii.gz -0.853958
+DEV048 beta_0034.nii svm_map.nii.gz -1.10314
+DEV048 beta_0035.nii logistic_map.nii.gz 11.1804
+DEV048 beta_0035.nii reg_look_train.nii.gz 21538.6
+DEV048 beta_0035.nii reg_train.nii.gz 24129.6
+DEV048 beta_0035.nii ridge_map.nii.gz 0.881169
+DEV048 beta_0035.nii svm_map.nii.gz 1.18526
+DEV048 beta_0036.nii logistic_map.nii.gz -3.34552
+DEV048 beta_0036.nii reg_look_train.nii.gz -288250
+DEV048 beta_0036.nii reg_train.nii.gz 90459.3
+DEV048 beta_0036.nii ridge_map.nii.gz -0.383753
+DEV048 beta_0036.nii svm_map.nii.gz -0.292274
+DEV048 beta_0037.nii logistic_map.nii.gz 9.40537
+DEV048 beta_0037.nii reg_look_train.nii.gz -41122.1
+DEV048 beta_0037.nii reg_train.nii.gz 88387.6
+DEV048 beta_0037.nii ridge_map.nii.gz 0.658397
+DEV048 beta_0037.nii svm_map.nii.gz 1.13247
+DEV048 beta_0038.nii logistic_map.nii.gz 30.6754
+DEV048 beta_0038.nii reg_look_train.nii.gz 468584
+DEV048 beta_0038.nii reg_train.nii.gz 233946
+DEV048 beta_0038.nii ridge_map.nii.gz 2.31012
+DEV048 beta_0038.nii svm_map.nii.gz 3.85241
+DEV048 beta_0039.nii logistic_map.nii.gz 3.38073
+DEV048 beta_0039.nii reg_look_train.nii.gz -286791
+DEV048 beta_0039.nii reg_train.nii.gz 96220.5
+DEV048 beta_0039.nii ridge_map.nii.gz -0.120255
+DEV048 beta_0039.nii svm_map.nii.gz 0.552107
+DEV048 beta_0040.nii logistic_map.nii.gz -8.32592
+DEV048 beta_0040.nii reg_look_train.nii.gz -101239
+DEV048 beta_0040.nii reg_train.nii.gz 119984
+DEV048 beta_0040.nii ridge_map.nii.gz -0.64906
+DEV048 beta_0040.nii svm_map.nii.gz -0.824042
+DEV048 beta_0041.nii logistic_map.nii.gz 5.32723
+DEV048 beta_0041.nii reg_look_train.nii.gz 55090.4
+DEV048 beta_0041.nii reg_train.nii.gz 115685
+DEV048 beta_0041.nii ridge_map.nii.gz 0.483133
+DEV048 beta_0041.nii svm_map.nii.gz 0.745402
+DEV048 beta_0042.nii logistic_map.nii.gz -5.97063
+DEV048 beta_0042.nii reg_look_train.nii.gz -208319
+DEV048 beta_0042.nii reg_train.nii.gz 64730.5
+DEV048 beta_0042.nii ridge_map.nii.gz -0.0813506
+DEV048 beta_0042.nii svm_map.nii.gz -0.546141
+DEV048 beta_0043.nii logistic_map.nii.gz 2.366
+DEV048 beta_0043.nii reg_look_train.nii.gz 42566.2
+DEV048 beta_0043.nii reg_train.nii.gz 108619
+DEV048 beta_0043.nii ridge_map.nii.gz 0.790776
+DEV048 beta_0043.nii svm_map.nii.gz 0.348314
+DEV048 beta_0044.nii logistic_map.nii.gz -17.6547
+DEV048 beta_0044.nii reg_look_train.nii.gz -112655
+DEV048 beta_0044.nii reg_train.nii.gz 118704
+DEV048 beta_0044.nii ridge_map.nii.gz -1.14919
+DEV048 beta_0044.nii svm_map.nii.gz -2.0005
+DEV048 beta_0045.nii logistic_map.nii.gz -1.17053
+DEV048 beta_0045.nii reg_look_train.nii.gz 90389.8
+DEV048 beta_0045.nii reg_train.nii.gz 110879
+DEV048 beta_0045.nii ridge_map.nii.gz 0.0450962
+DEV048 beta_0045.nii svm_map.nii.gz -0.313497
+DEV048 beta_0046.nii logistic_map.nii.gz -5.86861
+DEV048 beta_0046.nii reg_look_train.nii.gz 238399
+DEV048 beta_0046.nii reg_train.nii.gz 121564
+DEV048 beta_0046.nii ridge_map.nii.gz -0.0536292
+DEV048 beta_0046.nii svm_map.nii.gz -0.592337
+DEV048 beta_0047.nii logistic_map.nii.gz -12.9934
+DEV048 beta_0047.nii reg_look_train.nii.gz -174901
+DEV048 beta_0047.nii reg_train.nii.gz 123801
+DEV048 beta_0047.nii ridge_map.nii.gz -1.02743
+DEV048 beta_0047.nii svm_map.nii.gz -1.50319
+DEV048 beta_0055.nii logistic_map.nii.gz 28.6659
+DEV048 beta_0055.nii reg_look_train.nii.gz 288049
+DEV048 beta_0055.nii reg_train.nii.gz 118893
+DEV048 beta_0055.nii ridge_map.nii.gz 2.65308
+DEV048 beta_0055.nii svm_map.nii.gz 3.34959
+DEV048 beta_0056.nii logistic_map.nii.gz 0.911131
+DEV048 beta_0056.nii reg_look_train.nii.gz 17559.9
+DEV048 beta_0056.nii reg_train.nii.gz 122206
+DEV048 beta_0056.nii ridge_map.nii.gz 0.0323675
+DEV048 beta_0056.nii svm_map.nii.gz 0.193847
+DEV048 beta_0057.nii logistic_map.nii.gz 8.21748
+DEV048 beta_0057.nii reg_look_train.nii.gz 137320
+DEV048 beta_0057.nii reg_train.nii.gz 84608.1
+DEV048 beta_0057.nii ridge_map.nii.gz 0.615928
+DEV048 beta_0057.nii svm_map.nii.gz 0.996914
+DEV048 beta_0058.nii logistic_map.nii.gz 1.36187
+DEV048 beta_0058.nii reg_look_train.nii.gz -120120
+DEV048 beta_0058.nii reg_train.nii.gz 153891
+DEV048 beta_0058.nii ridge_map.nii.gz 0.0614772
+DEV048 beta_0058.nii svm_map.nii.gz 0.0747744
+DEV048 beta_0059.nii logistic_map.nii.gz 5.82048
+DEV048 beta_0059.nii reg_look_train.nii.gz -210877
+DEV048 beta_0059.nii reg_train.nii.gz 107770
+DEV048 beta_0059.nii ridge_map.nii.gz 0.786464
+DEV048 beta_0059.nii svm_map.nii.gz 0.520553
+DEV048 beta_0060.nii logistic_map.nii.gz 1.77236
+DEV048 beta_0060.nii reg_look_train.nii.gz 78713.9
+DEV048 beta_0060.nii reg_train.nii.gz 138836
+DEV048 beta_0060.nii ridge_map.nii.gz 0.436262
+DEV048 beta_0060.nii svm_map.nii.gz 0.159091
+DEV048 beta_0061.nii logistic_map.nii.gz -6.95303
+DEV048 beta_0061.nii reg_look_train.nii.gz -242342
+DEV048 beta_0061.nii reg_train.nii.gz 109955
+DEV048 beta_0061.nii ridge_map.nii.gz -0.515515
+DEV048 beta_0061.nii svm_map.nii.gz -0.893252
+DEV048 beta_0062.nii logistic_map.nii.gz -0.878971
+DEV048 beta_0062.nii reg_look_train.nii.gz -193195
+DEV048 beta_0062.nii reg_train.nii.gz 85717
+DEV048 beta_0062.nii ridge_map.nii.gz 0.0432065
+DEV048 beta_0062.nii svm_map.nii.gz -0.0834123
+DEV048 beta_0063.nii logistic_map.nii.gz 18.2493
+DEV048 beta_0063.nii reg_look_train.nii.gz 155893
+DEV048 beta_0063.nii reg_train.nii.gz 86492
+DEV048 beta_0063.nii ridge_map.nii.gz 1.47024
+DEV048 beta_0063.nii svm_map.nii.gz 2.20962
+DEV048 beta_0064.nii logistic_map.nii.gz 15.1272
+DEV048 beta_0064.nii reg_look_train.nii.gz 94128.3
+DEV048 beta_0064.nii reg_train.nii.gz 125189
+DEV048 beta_0064.nii ridge_map.nii.gz 0.945632
+DEV048 beta_0064.nii svm_map.nii.gz 1.78976
+DEV048 beta_0065.nii logistic_map.nii.gz 6.22042
+DEV048 beta_0065.nii reg_look_train.nii.gz 8182.23
+DEV048 beta_0065.nii reg_train.nii.gz 131628
+DEV048 beta_0065.nii ridge_map.nii.gz 0.702341
+DEV048 beta_0065.nii svm_map.nii.gz 0.630115
+DEV048 beta_0066.nii logistic_map.nii.gz 13.6992
+DEV048 beta_0066.nii reg_look_train.nii.gz 163008
+DEV048 beta_0066.nii reg_train.nii.gz 82562.8
+DEV048 beta_0066.nii ridge_map.nii.gz 1.04555
+DEV048 beta_0066.nii svm_map.nii.gz 1.61858
+DEV048 beta_0067.nii logistic_map.nii.gz 9.00066
+DEV048 beta_0067.nii reg_look_train.nii.gz 155010
+DEV048 beta_0067.nii reg_train.nii.gz 111455
+DEV048 beta_0067.nii ridge_map.nii.gz 0.734049
+DEV048 beta_0067.nii svm_map.nii.gz 1.03138
+DEV048 beta_0068.nii logistic_map.nii.gz 4.79667
+DEV048 beta_0068.nii reg_look_train.nii.gz -25895.9
+DEV048 beta_0068.nii reg_train.nii.gz 62834.8
+DEV048 beta_0068.nii ridge_map.nii.gz 0.421554
+DEV048 beta_0068.nii svm_map.nii.gz 0.60681
+DEV048 beta_0069.nii logistic_map.nii.gz 10.4549
+DEV048 beta_0069.nii reg_look_train.nii.gz 353367
+DEV048 beta_0069.nii reg_train.nii.gz 100115
+DEV048 beta_0069.nii ridge_map.nii.gz 0.681302
+DEV048 beta_0069.nii svm_map.nii.gz 1.15154
+DEV048 beta_0070.nii logistic_map.nii.gz 20.3384
+DEV048 beta_0070.nii reg_look_train.nii.gz 187348
+DEV048 beta_0070.nii reg_train.nii.gz 115184
+DEV048 beta_0070.nii ridge_map.nii.gz 1.66878
+DEV048 beta_0070.nii svm_map.nii.gz 2.30515
+DEV048 beta_0071.nii logistic_map.nii.gz 23.0998
+DEV048 beta_0071.nii reg_look_train.nii.gz 188609
+DEV048 beta_0071.nii reg_train.nii.gz 165305
+DEV048 beta_0071.nii ridge_map.nii.gz 1.513
+DEV048 beta_0071.nii svm_map.nii.gz 2.49352
+DEV048 beta_0072.nii logistic_map.nii.gz 3.93329
+DEV048 beta_0072.nii reg_look_train.nii.gz 156149
+DEV048 beta_0072.nii reg_train.nii.gz 94437.4
+DEV048 beta_0072.nii ridge_map.nii.gz 0.329799
+DEV048 beta_0072.nii svm_map.nii.gz 0.627434
+DEV048 beta_0073.nii logistic_map.nii.gz -0.593859
+DEV048 beta_0073.nii reg_look_train.nii.gz 33130.4
+DEV048 beta_0073.nii reg_train.nii.gz 73948.5
+DEV048 beta_0073.nii ridge_map.nii.gz -0.267114
+DEV048 beta_0073.nii svm_map.nii.gz -0.00502599
+DEV048 beta_0074.nii logistic_map.nii.gz 3.26317
+DEV048 beta_0074.nii reg_look_train.nii.gz 82947.9
+DEV048 beta_0074.nii reg_train.nii.gz 74050.1
+DEV048 beta_0074.nii ridge_map.nii.gz 0.0868941
+DEV048 beta_0074.nii svm_map.nii.gz 0.578159
+DEV048 beta_0082.nii logistic_map.nii.gz -6.92117
+DEV048 beta_0082.nii reg_look_train.nii.gz 6.25581e+07
+DEV048 beta_0082.nii reg_train.nii.gz 4.01923e+06
+DEV048 beta_0082.nii ridge_map.nii.gz 7.42756
+DEV048 beta_0082.nii svm_map.nii.gz -6.8469
+DEV048 beta_0083.nii logistic_map.nii.gz 75.0388
+DEV048 beta_0083.nii reg_look_train.nii.gz 6.22654e+07
+DEV048 beta_0083.nii reg_train.nii.gz 4.13452e+06
+DEV048 beta_0083.nii ridge_map.nii.gz 14.8421
+DEV048 beta_0083.nii svm_map.nii.gz 2.03758
+DEV048 beta_0084.nii logistic_map.nii.gz 52.4525
+DEV048 beta_0084.nii reg_look_train.nii.gz 6.20985e+07
+DEV048 beta_0084.nii reg_train.nii.gz 4.12184e+06
+DEV048 beta_0084.nii ridge_map.nii.gz 12.9841
+DEV048 beta_0084.nii svm_map.nii.gz -0.312564
+DEV048 beta_0085.nii logistic_map.nii.gz
+DEV048 beta_0085.nii reg_look_train.nii.gz
+DEV048 beta_0085.nii reg_train.nii.gz
+DEV048 beta_0085.nii ridge_map.nii.gz
+DEV048 beta_0085.nii svm_map.nii.gz
+DEV048 beta_0086.nii logistic_map.nii.gz
+DEV048 beta_0086.nii reg_look_train.nii.gz
+DEV048 beta_0086.nii reg_train.nii.gz
+DEV048 beta_0086.nii ridge_map.nii.gz
+DEV048 beta_0086.nii svm_map.nii.gz
+DEV048 beta_0087.nii logistic_map.nii.gz
+DEV048 beta_0087.nii reg_look_train.nii.gz
+DEV048 beta_0087.nii reg_train.nii.gz
+DEV048 beta_0087.nii ridge_map.nii.gz
+DEV048 beta_0087.nii svm_map.nii.gz
+DEV048 beta_0088.nii logistic_map.nii.gz
+DEV048 beta_0088.nii reg_look_train.nii.gz
+DEV048 beta_0088.nii reg_train.nii.gz
+DEV048 beta_0088.nii ridge_map.nii.gz
+DEV048 beta_0088.nii svm_map.nii.gz
+DEV048 beta_0089.nii logistic_map.nii.gz
+DEV048 beta_0089.nii reg_look_train.nii.gz
+DEV048 beta_0089.nii reg_train.nii.gz
+DEV048 beta_0089.nii ridge_map.nii.gz
+DEV048 beta_0089.nii svm_map.nii.gz
+DEV048 beta_0090.nii logistic_map.nii.gz
+DEV048 beta_0090.nii reg_look_train.nii.gz
+DEV048 beta_0090.nii reg_train.nii.gz
+DEV048 beta_0090.nii ridge_map.nii.gz
+DEV048 beta_0090.nii svm_map.nii.gz
+DEV048 beta_0091.nii logistic_map.nii.gz
+DEV048 beta_0091.nii reg_look_train.nii.gz
+DEV048 beta_0091.nii reg_train.nii.gz
+DEV048 beta_0091.nii ridge_map.nii.gz
+DEV048 beta_0091.nii svm_map.nii.gz
+DEV048 beta_0092.nii logistic_map.nii.gz
+DEV048 beta_0092.nii reg_look_train.nii.gz
+DEV048 beta_0092.nii reg_train.nii.gz
+DEV048 beta_0092.nii ridge_map.nii.gz
+DEV048 beta_0092.nii svm_map.nii.gz
+DEV048 beta_0093.nii logistic_map.nii.gz
+DEV048 beta_0093.nii reg_look_train.nii.gz
+DEV048 beta_0093.nii reg_train.nii.gz
+DEV048 beta_0093.nii ridge_map.nii.gz
+DEV048 beta_0093.nii svm_map.nii.gz
+DEV048 beta_0094.nii logistic_map.nii.gz
+DEV048 beta_0094.nii reg_look_train.nii.gz
+DEV048 beta_0094.nii reg_train.nii.gz
+DEV048 beta_0094.nii ridge_map.nii.gz
+DEV048 beta_0094.nii svm_map.nii.gz
+DEV048 beta_0095.nii logistic_map.nii.gz
+DEV048 beta_0095.nii reg_look_train.nii.gz
+DEV048 beta_0095.nii reg_train.nii.gz
+DEV048 beta_0095.nii ridge_map.nii.gz
+DEV048 beta_0095.nii svm_map.nii.gz
+DEV048 beta_0096.nii logistic_map.nii.gz
+DEV048 beta_0096.nii reg_look_train.nii.gz
+DEV048 beta_0096.nii reg_train.nii.gz
+DEV048 beta_0096.nii ridge_map.nii.gz
+DEV048 beta_0096.nii svm_map.nii.gz
+DEV048 beta_0097.nii logistic_map.nii.gz
+DEV048 beta_0097.nii reg_look_train.nii.gz
+DEV048 beta_0097.nii reg_train.nii.gz
+DEV048 beta_0097.nii ridge_map.nii.gz
+DEV048 beta_0097.nii svm_map.nii.gz
+DEV048 beta_0098.nii logistic_map.nii.gz
+DEV048 beta_0098.nii reg_look_train.nii.gz
+DEV048 beta_0098.nii reg_train.nii.gz
+DEV048 beta_0098.nii ridge_map.nii.gz
+DEV048 beta_0098.nii svm_map.nii.gz
+DEV048 beta_0099.nii logistic_map.nii.gz
+DEV048 beta_0099.nii reg_look_train.nii.gz
+DEV048 beta_0099.nii reg_train.nii.gz
+DEV048 beta_0099.nii ridge_map.nii.gz
+DEV048 beta_0099.nii svm_map.nii.gz
+DEV048 beta_0100.nii logistic_map.nii.gz
+DEV048 beta_0100.nii reg_look_train.nii.gz
+DEV048 beta_0100.nii reg_train.nii.gz
+DEV048 beta_0100.nii ridge_map.nii.gz
+DEV048 beta_0100.nii svm_map.nii.gz
+DEV048 beta_0101.nii logistic_map.nii.gz
+DEV048 beta_0101.nii reg_look_train.nii.gz
+DEV048 beta_0101.nii reg_train.nii.gz
+DEV048 beta_0101.nii ridge_map.nii.gz
+DEV048 beta_0101.nii svm_map.nii.gz

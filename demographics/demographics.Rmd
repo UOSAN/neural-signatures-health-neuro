@@ -1,0 +1,327 @@
+---
+title: "demographics"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.path = "figs/", dpi = 300, colormodel = "cmyk")
+options(scipen = 999)
+```
+
+# load packages
+```{r}
+library(tidyverse)
+library(knitr)
+library(readxl)
+```
+
+# load data
+```{r}
+# eating
+eating = read_xlsx("~/Dropbox (PfeiBer Lab)/NSC/All_Eating_fMRI_questionnaires_101613.xlsx", sheet = "Demo", skip = 1) %>%
+  rename("subjectID" = SUBJECT,
+         "sex" = "What is your gender?",
+         "age" = "What is your age?-Years",
+         "race.ethnicity" = "What is your cultural/ethnic background?") %>%
+select(subjectID, sex, age, race.ethnicity, BMI) %>%
+  filter(!is.na(subjectID)) %>%
+  mutate(subjectID = sprintf("ET%03d", subjectID),
+         neural.signature = "yes",
+         sex = ifelse(sex == 1, "male",
+               ifelse(sex == 2, "female", "other or unknown")),
+         race.ethnicity = ifelse(race.ethnicity == 1, "American Indian or Alaskan Native",
+                          ifelse(race.ethnicity == 2, "Asian",
+                          ifelse(race.ethnicity == 3, "Asian",
+                          ifelse(race.ethnicity == 4, "Black or African American",
+                          ifelse(race.ethnicity == 5, "White",
+                          ifelse(race.ethnicity == 6, "Hispanic or Latino",
+                          ifelse(race.ethnicity == 7, "White",
+                          ifelse(race.ethnicity == 8, "Unknown or Not Responded", race.ethnicity)))))))))
+
+# duckees
+file_dir = "~/Dropbox (PfeiBer Lab)/NSC/"
+file_pattern = "DuckEEs.*"
+file_list = list.files(file_dir, pattern = file_pattern)
+
+duckees = data.frame()
+for (file in file_list) {
+  temp = tryCatch(read_xlsx(file.path(file_dir,file), sheet = "forSPSS") %>%
+                    rename("subjectID" = SUBJECT) %>%
+                    mutate(subjectID = sprintf("DK%03d", subjectID),
+                           sex = "female",
+                           neural.signature = "yes") %>%
+                    select(neural.signature, subjectID, sex, age, BMI), error = function(e) message(file))
+  duckees = rbind(duckees, temp)
+  rm(temp)
+}
+
+duckees.raceeth = data.frame()
+for (file in file_list) {
+  temp = tryCatch(read_xlsx(file.path(file_dir,file), sheet = "PAL2") %>%
+                    rename("subjectID" = X__1,
+                           "White" = X__24,
+                           "American Indian or Alaskan Native" = X__25,
+                           "Black" = X__26,
+                           "Hispanic or Latino" = X__27,
+                           "Asian" = X__28,
+                           "Asian2" = X__29,
+                           "Other" = X__30) %>%
+                    mutate(subjectID = sprintf("DK%03d", as.numeric(subjectID))) %>%
+                    filter(!subjectID == "DK0NA") %>%
+                    gather(race.ethnicity, value, c("White", 
+                                                    "American Indian or Alaskan Native", 
+                                                    "Black",
+                                                    "Hispanic or Latino", 
+                                                    "Asian",
+                                                    "Asian2",
+                                                    "Other")) %>%
+                    select(subjectID, race.ethnicity, value) %>%
+                    filter(!is.na(value)) %>%
+                    mutate(value = as.numeric(value),
+                           hispanic = ifelse(race.ethnicity == "Hispanic", 1, NA)) %>%
+                    group_by(subjectID) %>%
+                    fill(hispanic, .direction = "up") %>%
+                    fill(hispanic, .direction = "down") %>%
+                    mutate(hispanic = ifelse(is.na(hispanic), 0, hispanic),
+                           race.ethnicity = ifelse(race.ethnicity == "White" & hispanic == 1, "Hispanic or Latino", race.ethnicity),
+                           race.ethnicity = ifelse(subjectID == "DK063" | (sum(value, na.rm = TRUE) > 1 & hispanic == 0), "More than One Race",
+                                            ifelse(race.ethnicity == "Other", "Unknown or Not Responded",
+                                            ifelse(race.ethnicity == "Asian2", "Asian", race.ethnicity))),
+                           race.ethnicity = ifelse(is.na(race.ethnicity), "Unknown or Not Responded", race.ethnicity)) %>%
+                    unique() %>%
+                    ungroup() %>%
+                    select(-c(value, hispanic)), error = function(e) message(file))
+  duckees.raceeth = rbind(duckees.raceeth, temp)
+  rm(temp)
+}
+
+duckees.merged = duckees %>%
+  left_join(., duckees.raceeth) %>%
+  arrange(subjectID)
+
+# CHIVES
+chives.bmi = read_xlsx("~/Dropbox (PfeiBer Lab)/CHIVES/ParticipantData/Participant_Measurements.xlsx") %>%
+  rename("subjectID" = Participant,
+         "BMI" = "T1 BMI") %>%
+  select(subjectID, BMI)
+
+chives = read_xlsx("~/Dropbox (PfeiBer Lab)/CHIVES/ParticipantData/ParticipantDemographics.xlsx") %>%
+  rename("subjectID" = Participant,
+         "sex" = Gender,
+         "age" = Age,
+         "race.ethnicity" = Ethnicity) %>%
+  left_join(., chives.bmi) %>%
+  extract(subjectID, "subjectID", "CH1([0-9]{3})") %>%
+  ungroup() %>%
+  mutate(subjectID = sprintf("CH%03d", as.numeric(subjectID)),
+         neural.signature = "yes",
+         development = "yes",
+         sex = ifelse(sex == "M", "male",
+               ifelse(sex == "F", "female", sex)),
+         race.ethnicity = ifelse(race.ethnicity == "Black, not of Hispanic Origin", "Black or African American",
+                          ifelse(race.ethnicity == "White, not of Hispanic Origin", "White",
+                          ifelse(race.ethnicity == "South Asian or Indian", "Asian",
+                          ifelse(race.ethnicity == "Middle Eastern", "White",
+                          ifelse(race.ethnicity == "Hispanic", "Hispanic or Latino",
+                          ifelse(race.ethnicity == "Other", "Unknown or Not Responded", race.ethnicity)))))),
+         race.ethnicity = ifelse(is.na(race.ethnicity), "Unknown or Not Responded", race.ethnicity)) %>%
+  select(neural.signature, development, subjectID, sex, age, race.ethnicity, BMI)
+
+# PCSR
+pcsr = read.csv("~/Dropbox (PfeiBer Lab)/NSC/PCSR_demographics.csv", stringsAsFactors = FALSE) %>%
+  select(subjectID, sex, age, race.ethnicity, BMI) %>%
+  mutate(race.ethnicity = ifelse(race.ethnicity == "Caucasian", "White",
+                          ifelse(race.ethnicity == "Hispanic", "Hispanic or Latino",
+                          ifelse(race.ethnicity %in% c("Biracial", "Mixed"), "More than One Race",
+                          ifelse(race.ethnicity == "", NA, race.ethnicity)))),
+         neural.signature = "yes")
+
+# DEV
+dev = read.csv("~/Documents/code/sanlab/DEV_scripts/behavioral/demographics/DEV2_DATA_2019-06-11_0057.csv", stringsAsFactors = FALSE) %>%
+  group_by(dev_id) %>%
+  fill(everything(), .direction = "up") %>%
+  fill(everything(), .direction = "down") %>%
+  select(-redcap_event_name) %>%
+  unique() %>%
+  rename("subjectID" = dev_id,
+         "American Indian or Alaskan Native" = race___1,
+         "Asian" = race___2,
+         "Native Hawaiian or Other Pacific Islander" = race___3,
+         "Black or African American" = race___4,
+         "White" = race___5,
+         "Hispanic or Latino" = race___6,
+         "More than One Race" = race___7,
+         "Unknown or Not Responded" = race___8,
+         "sex" = birthsex,
+         "BMI" = bmi_1) %>%
+  gather(race.ethnicity, value, -c(subjectID, sex, BMI, age)) %>%
+  filter(!value == 0) %>%
+  mutate(validation = "yes",
+         sex = ifelse(sex == 1, "female",
+               ifelse(sex == 2, "male", NA))) %>%
+  select(-value)
+
+# neural signature partitions
+file_dir = "~/Documents/code/sanlab/NSC_scripts/fMRI/mvpa/partitions/"
+file_pattern = ".*.csv"
+file_list = list.files(file_dir, pattern = file_pattern)
+
+partitions = data.frame()
+for (file in file_list) {
+  temp = tryCatch(read.csv(file.path(file_dir,file), stringsAsFactors = FALSE) %>%
+                    mutate(file = file) %>%
+                    extract(file, "partition", "(.*).csv") %>%
+                    select(subjectID, partition) %>%
+                    unique(), error = function(e) message(file))
+partitions = rbind(partitions, temp)
+  rm(temp)
+}
+
+# tasks
+wtp.dev = readRDS("~/Documents/code/sanlab/health_neuro/WTP_analyses/WTP_development_subsample.RDS") %>%
+  select(subjectID) %>%
+  mutate(task = "WTP") %>%
+  unique()
+
+wtp.val = readRDS("~/Documents/code/sanlab/health_neuro/WTP_analyses/WTP_validation_sample.RDS") %>%
+  select(subjectID) %>%
+  mutate(task = "WTP") %>%
+  unique()
+
+roc.dev = readRDS("~/Documents/code/sanlab/health_neuro/ROC_analyses/ROC_development_subsample.RDS") %>%
+  select(subjectID) %>%
+  mutate(task = "ROC") %>%
+  unique()
+
+roc.val = readRDS("~/Documents/code/sanlab/health_neuro/ROC_analyses/ROC_validation_sample.RDS") %>%
+  select(subjectID) %>%
+  mutate(task = "ROC") %>%
+  unique()
+
+tasks = bind_rows(wtp.dev, wtp.val, roc.dev, roc.val)
+```
+
+# merge datasets
+```{r}
+merged = bind_rows(eating, duckees.merged, chives, pcsr, dev) %>%
+  left_join(., partitions) %>%
+  filter(!(grepl("DK|ET|PC", subjectID) & is.na(partition))) %>%
+  mutate(neural.signature = ifelse(grepl("CH", subjectID) & is.na(partition), NA, neural.signature)) %>%
+  extract(subjectID, "subNum", ".*([0-9]{3})", remove = FALSE) %>%
+  mutate(subjectID = ifelse(grepl("CH", subjectID), sprintf("CHIVES1%03d", as.numeric(subNum)), subjectID),
+         race.ethnicity = ifelse(is.na(race.ethnicity), "Unknown or Not Responded", race.ethnicity)) %>%
+  select(-subNum) %>%
+  left_join(., tasks)
+```
+
+# summarize
+## neural signature sample
+```{r}
+merged %>%
+  filter(neural.signature == "yes") %>%
+  filter(grepl("train", partition)) %>%
+  select(-task) %>%
+  unique() %>%
+  mutate(study = ifelse(grepl("CH", subjectID), "CHIVES",
+                 ifelse(grepl("ET", subjectID), "eating", 
+                 ifelse(grepl("DK", subjectID), "duckees", "PCSR")))) %>%
+  group_by(study) %>%
+  summarize(n = n())
+
+merged %>%
+  filter(neural.signature == "yes") %>%
+  filter(grepl("train", partition)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(sex) %>%
+  summarize(n = n())
+
+merged %>%
+  filter(neural.signature == "yes") %>%
+  filter(grepl("train", partition)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(race.ethnicity) %>%
+  summarize(nrows = nrow(.),
+            percent = round((n() / nrow(.)) * 100, 2))
+
+merged %>%
+  filter(neural.signature == "yes") %>%
+  filter(grepl("train", partition)) %>%
+  select(-task) %>%
+  unique() %>%
+  summarize(age.sd = sd(age, na.rm = TRUE),
+            age = mean(age, na.rm = TRUE),
+            BMI.sd = sd(BMI, na.rm = TRUE),
+            BMI = mean(BMI, na.rm = TRUE))
+
+
+```
+
+## development subsample
+```{r}
+merged %>%
+  filter(development == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(sex) %>%
+  summarize(n = n())
+
+merged %>%
+  filter(development == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(race.ethnicity) %>%
+  summarize(nrows = nrow(.),
+            percent = round((n() / nrow(.)) * 100, 2))
+
+merged %>%
+  filter(development == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  summarize(age.sd = sd(age, na.rm = TRUE),
+            age = mean(age, na.rm = TRUE),
+            BMI.sd = sd(BMI, na.rm = TRUE),
+            BMI = mean(BMI, na.rm = TRUE))
+```
+
+## validation sample
+SOMEONE IS MISSING
+```{r}
+merged %>%
+  filter(validation == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(sex) %>%
+  summarize(n = n())
+
+merged %>%
+  filter(validation == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  group_by(race.ethnicity) %>%
+  summarize(nrows = nrow(.),
+            percent = round((n() / nrow(.)) * 100, 2))
+
+merged %>%
+  filter(validation == "yes" & !is.na(task)) %>%
+  select(-task) %>%
+  unique() %>%
+  summarize(age.sd = sd(age, na.rm = TRUE),
+            age = mean(age, na.rm = TRUE),
+            BMI.sd = sd(BMI, na.rm = TRUE),
+            BMI = mean(BMI, na.rm = TRUE))
+```

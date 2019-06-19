@@ -1,0 +1,196 @@
+---
+title: "Prep ROC Development Subsample Data"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+options(scipen = 999)
+```
+
+# load packages
+```{r}
+library(tidyverse)
+```
+
+# load task data
+```{r}
+source("load_data_development.R")
+```
+
+# check ratings
+Check if wrong buttons were used (i.e., not 5-9)
+
+* CHIVES1064 = technical error, no responses recorded
+* CHIVES1072 = technical error, no responses recorded for run2
+
+```{r}
+subs = data.tidy %>%
+  group_by(subjectID, run, rating) %>%
+  summarize(n = n()) %>%
+  spread(rating, n) %>%
+  mutate(messed = ifelse(is.na(`5`) & !is.na(`<NA>`), "yes", NA)) %>%
+  filter(messed == "yes") %>% 
+  ungroup() %>% 
+  select(subjectID) %>% 
+  unique()
+
+data.tidy %>%
+  group_by(subjectID, run, rating) %>%
+  summarize(n = n()) %>%
+  spread(rating, n) %>%
+  mutate(messed = ifelse(is.na(`5`) & !is.na(`<NA>`), "yes", NA)) %>%
+  filter(subjectID %in% subs$subjectID)
+```
+
+# recode ratings
+
+```{r}
+data.ex = data.tidy %>%
+  mutate(rating = rating - 4) %>%
+  group_by(subjectID) %>%
+  arrange(subjectID, run) %>%
+  mutate(trial = row_number())
+```
+
+# load striping info
+```{r}
+striping = read.csv("striping_QC_development.csv")
+```
+
+# load mean intensity values
+```{r}
+file_dir = "dotProducts_development/"
+file_pattern = "CHIVES1[0-9]{3}_meanIntensity.txt"
+file_list = list.files(file_dir, pattern = file_pattern)
+
+intensities = data.frame()
+
+for (file in file_list) {
+  temp = tryCatch(read.table(file.path(file_dir,file), fill = TRUE) %>%
+                    rename("subjectID" = V1,
+                           "meanIntensity" = V3) %>%
+                    extract(V2, "beta", "beta_([0-9]{4}).nii") %>%
+                    mutate(beta = as.integer(beta)), error = function(e) message(file))
+  intensities = rbind(intensities, temp)
+  rm(temp)
+}
+```
+
+# load dot products
+```{r}
+file_dir = "dotProducts_development/"
+file_pattern = "CHIVES[0-9]{4}_dotProducts.txt"
+file_list = list.files(file_dir, pattern = file_pattern)
+
+dots = data.frame()
+
+for (file in file_list) {
+  temp = tryCatch(read.table(file.path(file_dir,file), fill = TRUE) %>%
+                    rename("subjectID" = V1,
+                           "map" = V3,
+                           "dotProduct" = V4) %>%
+                    extract(V2, "beta", "beta_([0-9]{4}).nii") %>%
+                    extract(map, "algorithm", "(.*)_.*.nii") %>%
+                    mutate(beta = as.integer(beta)), error = function(e) message(file))
+  dots = rbind(dots, temp)
+  rm(temp)
+}
+```
+
+# join intensities and dots
+* recode trials with extreme intensities as NA
+```{r}
+dots.merged = dots %>%
+  left_join(., intensities, by = c("subjectID", "beta")) %>%
+  group_by(subjectID, algorithm)
+
+# plot original
+dots.merged %>%
+  filter(algorithm == "logistic") %>%
+  ggplot(aes(1, meanIntensity)) +
+    geom_boxplot()
+
+# assess extreme values and exclude when calculating SDs
+dots.merged %>%
+  filter(algorithm == "logistic") %>%
+  arrange(meanIntensity)
+
+dots.merged %>%
+  filter(algorithm == "logistic") %>%
+  arrange(-meanIntensity)
+
+# recode outliers as NA
+dots.merged = dots.merged %>%
+  ungroup() %>%
+  mutate(meanIntensity = ifelse(meanIntensity > 1 | meanIntensity < -1, NA, meanIntensity),
+         median = median(meanIntensity, na.rm = TRUE),
+         sd3 = 3*sd(meanIntensity, na.rm = TRUE),
+         outlier = ifelse(meanIntensity > median + sd3 | meanIntensity < median - sd3, "yes", "no"),
+         dotProduct = ifelse(outlier == "yes", NA, dotProduct))
+  
+# plot after
+dots.merged %>%
+  filter(algorithm == "logistic") %>%
+  filter(outlier == "no") %>%
+  ggplot(aes(1, meanIntensity)) +
+    geom_boxplot()
+```
+
+# exclude outliers and standardize
+* standardize within algorithm
+```{r}
+dots.ex = dots.merged %>%
+  group_by(algorithm, subjectID) %>%
+  mutate(trial = row_number()) %>%
+  left_join(., striping, by = c("subjectID", "beta"))  %>%
+  mutate(dotProduct = ifelse(!is.na(striping), NA, dotProduct)) %>%
+  filter(!algorithm %in% c("ridge", "svm")) %>%
+  group_by(subjectID, algorithm) %>% # standardize within sub and algorithm
+  mutate(dotSTD = scale(dotProduct, center = FALSE)) 
+```
+
+# merge data and exclude subs
+Exclusions
+
+* MRI motion (>10%) and data quality exclusions: CHIVES1013, CHIVES1044, CHIVES1100
+* Run motion exclusions: CHIVES1025 (run1), CHIVES1061 (run1), CHIVES1091 (run1)
+* Non-compliance: CHIVES1075
+* Technical error (no responses recorded): CHIVES1064, CHIVES1072 (run2)
+* Repeated run: CHIVES1036 (run1)
+
+Other
+* select only craved trials
+```{r}
+data = left_join(dots.ex, data.ex, by = c("subjectID", "trial")) %>%
+  filter(!subjectID %in% c("CHIVES1013", "CHIVES1044", "CHIVES1100", "CHIVES1075", "CHIVES1064")) %>%
+  filter(!(subjectID == "CHIVES1025" & run == 1)) %>%
+  filter(!(subjectID == "CHIVES1061" & run == 2)) %>%
+  filter(!(subjectID == "CHIVES1091" & run == 1)) %>%
+  filter(!(subjectID == "CHIVES1072" & run == 2)) %>%
+  filter(!(subjectID == "CHIVES1036" & trial %in% 1:40)) %>%
+  ungroup() %>%
+  mutate(algorithm = ifelse(algorithm == "reg_look", "regulate > look", 
+                     ifelse(algorithm == "reg", "regulate > rest", 
+                     ifelse(algorithm == "logistic", "logistic classifier", algorithm)))) %>%
+  filter(craving == "craved") %>%
+  arrange(subjectID, trial)
+```
+
+# save variables
+```{r}
+saveRDS(data, "ROC_near_validation.RDS")
+```
