@@ -128,7 +128,7 @@ chives = read_xlsx("~/Dropbox (PfeiBer Lab)/CHIVES/ParticipantData/ParticipantDe
   ungroup() %>%
   mutate(subjectID = sprintf("CH%03d", as.numeric(subjectID)),
          neural.signature = "yes",
-         development = "yes",
+         partial.validation = "yes",
          sex = ifelse(sex == "M", "male",
                ifelse(sex == "F", "female", sex)),
          race.ethnicity = ifelse(race.ethnicity == "Black, not of Hispanic Origin", "Black or African American",
@@ -138,7 +138,7 @@ chives = read_xlsx("~/Dropbox (PfeiBer Lab)/CHIVES/ParticipantData/ParticipantDe
                           ifelse(race.ethnicity == "Hispanic", "Hispanic or Latino",
                           ifelse(race.ethnicity == "Other", "Unknown or Not Responded", race.ethnicity)))))),
          race.ethnicity = ifelse(is.na(race.ethnicity), "Unknown or Not Responded", race.ethnicity)) %>%
-  select(neural.signature, development, subjectID, sex, age, race.ethnicity, BMI)
+  select(neural.signature, partial.validation, subjectID, sex, age, race.ethnicity, BMI)
 
 # PCSR
 pcsr = read.csv("~/Dropbox (PfeiBer Lab)/NSC/PCSR_demographics.csv", stringsAsFactors = FALSE) %>%
@@ -168,8 +168,10 @@ dev = read.csv("~/Documents/code/sanlab/DEV_scripts/behavioral/demographics/DEV2
          "sex" = birthsex,
          "BMI" = bmi_1) %>%
   gather(race.ethnicity, value, -c(subjectID, sex, BMI, age)) %>%
+  mutate(value = ifelse(subjectID == "DEV033" & race.ethnicity == "Unknown or Not Responded", 1, value)) %>%
   filter(!value == 0) %>%
-  mutate(validation = "yes",
+  filter(!(subjectID == "DEV072" & race.ethnicity == "Hispanic or Latino")) %>%
+  mutate(complete.validation = "yes",
          sex = ifelse(sex == 1, "female",
                ifelse(sex == 2, "male", NA))) %>%
   select(-value)
@@ -191,27 +193,27 @@ partitions = rbind(partitions, temp)
 }
 
 # tasks
-wtp.dev = readRDS("~/Documents/code/sanlab/health_neuro/WTP_analyses/WTP_development_subsample.RDS") %>%
+fv.dev = readRDS("~/Documents/code/sanlab/neural-signatures-health-neuro/FV_analyses/FV_partial_validation.RDS") %>%
   select(subjectID) %>%
-  mutate(task = "WTP") %>%
+  mutate(task = "FV") %>%
   unique()
 
-wtp.val = readRDS("~/Documents/code/sanlab/health_neuro/WTP_analyses/WTP_validation_sample.RDS") %>%
+fv.val = readRDS("~/Documents/code/sanlab/neural-signatures-health-neuro/FV_analyses/FV_complete_validation.RDS") %>%
   select(subjectID) %>%
-  mutate(task = "WTP") %>%
+  mutate(task = "FV") %>%
   unique()
 
-roc.dev = readRDS("~/Documents/code/sanlab/health_neuro/ROC_analyses/ROC_development_subsample.RDS") %>%
-  select(subjectID) %>%
-  mutate(task = "ROC") %>%
-  unique()
-
-roc.val = readRDS("~/Documents/code/sanlab/health_neuro/ROC_analyses/ROC_validation_sample.RDS") %>%
+roc.dev = readRDS("~/Documents/code/sanlab/neural-signatures-health-neuro/ROC_analyses/ROC_partial_validation.RDS") %>%
   select(subjectID) %>%
   mutate(task = "ROC") %>%
   unique()
 
-tasks = bind_rows(wtp.dev, wtp.val, roc.dev, roc.val)
+roc.val = readRDS("~/Documents/code/sanlab/neural-signatures-health-neuro/ROC_analyses/ROC_complete_validation.RDS") %>%
+  select(subjectID) %>%
+  mutate(task = "ROC") %>%
+  unique()
+
+tasks = bind_rows(fv.dev, fv.val, roc.dev, roc.val)
 ```
 
 # merge datasets
@@ -219,12 +221,16 @@ tasks = bind_rows(wtp.dev, wtp.val, roc.dev, roc.val)
 merged = bind_rows(eating, duckees.merged, chives, pcsr, dev) %>%
   left_join(., partitions) %>%
   filter(!(grepl("DK|ET|PC", subjectID) & is.na(partition))) %>%
-  mutate(neural.signature = ifelse(grepl("CH", subjectID) & is.na(partition), NA, neural.signature)) %>%
+  mutate(neural.signature = ifelse(grepl("CH", subjectID) & !partition == "train", NA, neural.signature)) %>%
   extract(subjectID, "subNum", ".*([0-9]{3})", remove = FALSE) %>%
   mutate(subjectID = ifelse(grepl("CH", subjectID), sprintf("CHIVES1%03d", as.numeric(subNum)), subjectID),
          race.ethnicity = ifelse(is.na(race.ethnicity), "Unknown or Not Responded", race.ethnicity)) %>%
   select(-subNum) %>%
-  left_join(., tasks)
+  full_join(., tasks) %>%
+  filter(!(grepl("DEV", subjectID) & is.na(task)) & !(grepl("CH", subjectID) & is.na(task))) %>%
+  filter(!(grepl("DK|ET|PC", subjectID) & partition %in% c("test", "holdout"))) %>%
+  mutate(complete.validation = ifelse(subjectID == "DEV007", "yes", complete.validation),
+         race.ethnicity = ifelse(subjectID == "DEV007", "Unknown or Not Responded", race.ethnicity))
 ```
 
 # summarize
@@ -232,7 +238,6 @@ merged = bind_rows(eating, duckees.merged, chives, pcsr, dev) %>%
 ```{r}
 merged %>%
   filter(neural.signature == "yes") %>%
-  filter(grepl("train", partition)) %>%
   select(-task) %>%
   unique() %>%
   mutate(study = ifelse(grepl("CH", subjectID), "CHIVES",
@@ -243,7 +248,6 @@ merged %>%
 
 merged %>%
   filter(neural.signature == "yes") %>%
-  filter(grepl("train", partition)) %>%
   select(-task) %>%
   unique() %>%
   group_by(sex) %>%
@@ -251,7 +255,6 @@ merged %>%
 
 merged %>%
   filter(neural.signature == "yes") %>%
-  filter(grepl("train", partition)) %>%
   select(-task) %>%
   unique() %>%
   group_by(race.ethnicity) %>%
@@ -260,28 +263,25 @@ merged %>%
 
 merged %>%
   filter(neural.signature == "yes") %>%
-  filter(grepl("train", partition)) %>%
   select(-task) %>%
   unique() %>%
   summarize(age.sd = sd(age, na.rm = TRUE),
             age = mean(age, na.rm = TRUE),
             BMI.sd = sd(BMI, na.rm = TRUE),
             BMI = mean(BMI, na.rm = TRUE))
-
-
 ```
 
-## development subsample
+## partial validation sample
 ```{r}
 merged %>%
-  filter(development == "yes" & !is.na(task)) %>%
+  filter(partial.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   group_by(sex) %>%
   summarize(n = n())
 
 merged %>%
-  filter(development == "yes" & !is.na(task)) %>%
+  filter(partial.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   group_by(race.ethnicity) %>%
@@ -289,7 +289,7 @@ merged %>%
             percent = round((n() / nrow(.)) * 100, 2))
 
 merged %>%
-  filter(development == "yes" & !is.na(task)) %>%
+  filter(partial.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   summarize(age.sd = sd(age, na.rm = TRUE),
@@ -298,18 +298,17 @@ merged %>%
             BMI = mean(BMI, na.rm = TRUE))
 ```
 
-## validation sample
-SOMEONE IS MISSING
+## complete validation sample
 ```{r}
 merged %>%
-  filter(validation == "yes" & !is.na(task)) %>%
+  filter(complete.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   group_by(sex) %>%
   summarize(n = n())
 
 merged %>%
-  filter(validation == "yes" & !is.na(task)) %>%
+  filter(complete.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   group_by(race.ethnicity) %>%
@@ -317,7 +316,7 @@ merged %>%
             percent = round((n() / nrow(.)) * 100, 2))
 
 merged %>%
-  filter(validation == "yes" & !is.na(task)) %>%
+  filter(complete.validation == "yes" & !is.na(task)) %>%
   select(-task) %>%
   unique() %>%
   summarize(age.sd = sd(age, na.rm = TRUE),
@@ -325,3 +324,14 @@ merged %>%
             BMI.sd = sd(BMI, na.rm = TRUE),
             BMI = mean(BMI, na.rm = TRUE))
 ```
+
+## write csv
+```{r}
+merged %>%
+  mutate(validation = ifelse(partial.validation == "yes" & is.na(complete.validation), "partial",
+                      ifelse(complete.validation == "yes" & is.na(partial.validation), "complete", NA))) %>%
+  select(subjectID, sex, age, race.ethnicity, BMI, neural.signature, validation) %>%
+  unique() %>%
+  write.csv(., "demographics.csv", row.names = FALSE)
+```
+

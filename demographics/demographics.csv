@@ -1,0 +1,288 @@
+"subjectID","sex","age","race.ethnicity","BMI","neural.signature","validation"
+"ET001","male",25,"Hispanic or Latino",NA,"yes",NA
+"ET004","female",24,"White",NA,"yes",NA
+"ET013","female",20,"White",23.5624426078972,"yes",NA
+"ET014","male",22,"White",18.6148648648649,"yes",NA
+"ET015","female",21,"White",23.6724489795918,"yes",NA
+"ET016","female",19,"White",28.2426538108356,"yes",NA
+"ET017","male",24,"White",22.8869985297206,"yes",NA
+"ET018","male",20,"White",22.4662162162162,"yes",NA
+"ET020","male",21,"White",21.1824324324324,"yes",NA
+"ET021","male",20,"White",23.6252888048729,"yes",NA
+"ET022","male",22,"Hispanic or Latino",36.9375117282792,"yes",NA
+"ET023","female",20,"White",17.4837802768166,"yes",NA
+"ET024","female",19,"White",29.2837946788498,"yes",NA
+"ET025","male",26,"White",24.4051416776131,"yes",NA
+"ET026","female",20,"White",20.3347107438017,"yes",NA
+"ET029","female",20,"White",20.6659505907626,"yes",NA
+"ET032","male",19,"White",19.8986486486486,"yes",NA
+"ET033","female",20,"White",19.1349112426036,"yes",NA
+"ET034","female",21,"White",19.663387345679,"yes",NA
+"ET035","female",24,"White",21.6307692307692,"yes",NA
+"ET036","male",24,"Asian",23.731674382716,"yes",NA
+"ET039","female",20,"Asian",19.217929382438,"yes",NA
+"ET042","female",20,"Asian",18.5149153453373,"yes",NA
+"ET043","female",21,"Hispanic or Latino",18.021240234375,"yes",NA
+"ET045","female",18,"White",23.170166015625,"yes",NA
+"ET046","female",18,"White",21.1416796613945,"yes",NA
+"ET047","female",19,"White",19.7642733564014,"yes",NA
+"ET050","male",20,"White",18.9853395061728,"yes",NA
+"ET052","male",21,"White",21.1071495590167,"yes",NA
+"DK003","female",22.8747433264887,"Unknown or Not Responded",NA,"yes",NA
+"DK008","female",16.7337440109514,"White",19.7513007284079,"yes",NA
+"DK010","female",22.2067077344285,"White",21.6307692307692,"yes",NA
+"DK011","female",19.9479808350445,"White",21.2846020761246,"yes",NA
+"DK016","female",19.1759069130732,"White",25.74462890625,"yes",NA
+"DK018","female",16.3121149897331,"White",18.0752984389348,"yes",NA
+"DK019","female",15.1403148528405,"White",21.0776014109347,"yes",NA
+"DK020","female",16.4791238877481,"White",21.945889698231,"yes",NA
+"DK023","female",21.3223819301848,"White",21.254724111867,"yes",NA
+"DK024","female",21.2347707049966,"White",24.9585798816568,"yes",NA
+"DK025","female",19.337440109514,"White",20.8030612244898,"yes",NA
+"DK026","female",22.2970568104038,"White",16.6390532544379,"yes",NA
+"DK028","female",14.280629705681,"White",20.2291535391724,"yes",NA
+"DK030","female",21.678302532512,"White",20.221186272565,"yes",NA
+"DK031","female",14.6694045174538,"White",27.4609375,"yes",NA
+"DK032","female",14.3709787816564,"White",18.87939453125,"yes",NA
+"DK035","female",20.5010266940452,"White",21.0314776274714,"yes",NA
+"DK042","female",16.0547570157426,"White",19.1349112426036,"yes",NA
+"DK043","female",13.7604380561259,"White",16.8516271373414,"yes",NA
+"DK044","female",13.5058179329227,"White",16.9933929939713,"yes",NA
+"DK045","female",13.1416837782341,"White",21.7860922146636,"yes",NA
+"DK048","female",12.8925393566051,"White",15.402832002797,"yes",NA
+"DK049","female",12.4955509924709,"White",23.6252888048729,"yes",NA
+"DK050","female",14.8090349075975,"White",18.7926041434618,"yes",NA
+"DK051","female",10.3983572895277,"White",17.3099415204678,"yes",NA
+"DK052","female",18.2532511978097,"White",18.0142827137156,"yes",NA
+"DK054","female",17.782340862423,"Unknown or Not Responded",21.0314776274714,"yes",NA
+"DK055","female",18.2614647501711,"White",19.1855788566504,"yes",NA
+"DK057","female",10.1629021218344,"White",21.4488663450354,"yes",NA
+"DK058","female",18.1738535249829,"White",21.945889698231,"yes",NA
+"CHIVES1001","male",39,"Black or African American",37.8125801867772,"yes","partial"
+"CHIVES1002","female",44,"White",38.2479836660785,"yes","partial"
+"CHIVES1003","female",34,"White",29.7479179060083,NA,"partial"
+"CHIVES1004","female",39,"Asian",33.8923905753667,"yes","partial"
+"CHIVES1005","female",40,"White",33.9964835633225,"yes","partial"
+"CHIVES1006","female",34,"Hispanic or Latino",30.6558916290156,"yes","partial"
+"CHIVES1007","male",39,"White",30.8458369136537,NA,"partial"
+"CHIVES1008","male",35,"White",28.7670691572536,"yes","partial"
+"CHIVES1009","female",42,"White",29.072989364779,"yes","partial"
+"CHIVES1011","female",45,"Unknown or Not Responded",28.6902606310014,NA,"partial"
+"CHIVES1012","female",45,"White",32.2514602884939,NA,"partial"
+"CHIVES1013","female",37,"White",34.774058669055,NA,"partial"
+"CHIVES1014","male",36,"White",37.0050573578389,"yes","partial"
+"CHIVES1016","female",36,"White",28.2965114879343,"yes","partial"
+"CHIVES1017","female",39,"White",33.1946095917558,"yes","partial"
+"CHIVES1018","female",39,"White",31.6369854299952,"yes","partial"
+"CHIVES1019","female",41,"White",26.1754844840211,NA,"partial"
+"CHIVES1020","female",43,"White",30.6213919466456,NA,"partial"
+"CHIVES1021","male",46,"White",26.9313116895358,NA,"partial"
+"CHIVES1022","female",40,"White",30.0299621233535,NA,"partial"
+"CHIVES1023","female",45,"White",30.5213399892698,NA,"partial"
+"CHIVES1024","female",44,"Unknown or Not Responded",37.765193584458,"yes","partial"
+"CHIVES1025","male",40,"White",30.8829414118589,"yes","partial"
+"CHIVES1026","female",40,"White",29.8648590567764,"yes","partial"
+"CHIVES1027","female",35,"White",28.0826093583295,NA,"partial"
+"CHIVES1029","female",36,"White",33.4873478339009,NA,"partial"
+"CHIVES1030","female",40,"White",34.5867908453252,NA,"partial"
+"CHIVES1031","male",35,"White",28.0374725718298,"yes","partial"
+"CHIVES1032","female",37,"White",28.8631485923495,"yes","partial"
+"CHIVES1033","female",36,"White",33.0076189461346,NA,"partial"
+"CHIVES1034","female",36,"White",32.7877776164901,NA,"partial"
+"CHIVES1035","female",39,"White",29.0940569837028,NA,"partial"
+"CHIVES1036","female",38,"White",37.7388946280992,NA,"partial"
+"CHIVES1037","female",38,"White",36.7162110202512,"yes","partial"
+"CHIVES1038","female",38,"Unknown or Not Responded",30.6831065759637,NA,"partial"
+"CHIVES1041","male",43,"White",33.1927721045234,NA,"partial"
+"CHIVES1042","female",46,"White",33.2326357059758,"yes","partial"
+"CHIVES1043","female",36,"White",36.1681990265008,"yes","partial"
+"CHIVES1044","female",41,"White",30.0686390532544,NA,"partial"
+"CHIVES1045","female",37,"Hispanic or Latino",31.9851028288195,NA,"partial"
+"CHIVES1046","female",38,"White",37.8829940255826,"yes","partial"
+"CHIVES1047","female",35,"White",25.1382578080755,"yes","partial"
+"CHIVES1048","female",40,"White",35.3907517577069,"yes","partial"
+"CHIVES1049","female",39,"White",27.0707070707071,"yes","partial"
+"CHIVES1050","female",44,"White",27.2392244832559,NA,"partial"
+"CHIVES1051","female",43,"White",30.3823107435227,"yes","partial"
+"CHIVES1052","female",42,"White",29.3561902675466,"yes","partial"
+"CHIVES1053","female",33,"Hispanic or Latino",32.6990952979837,NA,"partial"
+"CHIVES1054","female",36,"White",36.7299600302888,NA,"partial"
+"CHIVES1055","female",46,"White",32.9218106995885,NA,"partial"
+"CHIVES1056","female",43,"White",36.4762161953628,"yes","partial"
+"CHIVES1057","female",36,"White",28.256989886972,"yes","partial"
+"CHIVES1058","female",44,"White",37.5725320123961,"yes","partial"
+"CHIVES1059","female",39,"Hispanic or Latino",29.5475530932595,"yes","partial"
+"CHIVES1060","female",40,"White",28.7875323883554,"yes","partial"
+"CHIVES1061","female",38,"Black or African American",32.40234375,NA,"partial"
+"CHIVES1062","female",44,"White",34.7961530266628,"yes","partial"
+"CHIVES1063","female",45,"White",26.6346593507087,"yes","partial"
+"CHIVES1064","male",36,"White",32.4029207552228,NA,"partial"
+"CHIVES1065","female",40,"Hispanic or Latino",29.6201814058957,"yes","partial"
+"CHIVES1066","female",36,"White",36.4292555523567,"yes","partial"
+"CHIVES1068","female",41,"White",30.634885275117,"yes","partial"
+"CHIVES1069","female",41,"White",37.11465657,NA,"partial"
+"CHIVES1071","female",45,"White",33.023660908695,"yes","partial"
+"CHIVES1072","female",43,"White",31.8065641608179,NA,"partial"
+"CHIVES1074","female",41,"Hispanic or Latino",36.8657092466616,NA,"partial"
+"CHIVES1076","female",35,"White",33.5271837305518,"yes","partial"
+"CHIVES1077","female",35,"White",36.1785275450153,NA,"partial"
+"CHIVES1078","female",33,"White",30.6767192698636,"yes","partial"
+"CHIVES1079","female",34,"White",27.0792241946088,"yes","partial"
+"CHIVES1080","female",37,"White",29.8962500346449,"yes","partial"
+"CHIVES1081","female",35,"White",32.6062368083026,"yes","partial"
+"CHIVES1082","female",36,"American Indian or Alaskan Native",24.313297986555,NA,"partial"
+"CHIVES1083","female",35,"White",27.8348025600773,"yes","partial"
+"CHIVES1084","female",33,"White",31.0251127235809,NA,"partial"
+"CHIVES1085","male",37,"White",27.4083161157025,"yes","partial"
+"CHIVES1087","female",39,"White",41.9611239960814,NA,"partial"
+"CHIVES1088","female",43,"White",25.97812456,"yes","partial"
+"CHIVES1089","female",39,"White",27.35103019,"yes","partial"
+"CHIVES1090","female",41,"White",30.7797051829321,"yes","partial"
+"CHIVES1091","male",37,"White",24.8008828233035,NA,"partial"
+"CHIVES1092","female",39,"White",27.639129965368,NA,"partial"
+"CHIVES1094","female",36,"White",25.8612048514818,"yes","partial"
+"CHIVES1095","female",41,"Black or African American",29.9096789231397,NA,"partial"
+"CHIVES1096","male",42,"White",29.2858179706779,"yes","partial"
+"CHIVES1097","male",38,"White",32.1483420981811,NA,"partial"
+"CHIVES1098","male",42,"Hispanic or Latino",23.8659742483087,"yes","partial"
+"CHIVES1100","female",41,"White",24.5934895914609,NA,"partial"
+"CHIVES1102","female",35,"White",31.1061801446417,NA,"partial"
+"CHIVES1103","male",40,"White",31.5721362350513,NA,"partial"
+"CHIVES1105","female",45,"White",40.5139833711262,"yes","partial"
+"PC001","female",29,"White",60.68746062,"yes",NA
+"PC002","female",30,"White",47.609045,"yes",NA
+"PC003","female",40,"White",21.23823845,"yes",NA
+"PC004","female",39,"More than One Race",41.63774105,"yes",NA
+"PC006","female",42,"White",25.20816568,"yes",NA
+"PC007","female",40,"White",22.73934047,"yes",NA
+"PC008","female",30,"White",20.76733398,"yes",NA
+"PC011","female",29,"White",40.99731255,"yes",NA
+"PC012","female",39,"White",31.24444444,"yes",NA
+"PC013","female",25,"White",35.07952773,"yes",NA
+"PC014","female",35,"White",48.95458478,"yes",NA
+"PC018","female",29,"White",32.43823242,"yes",NA
+"PC022","female",36,"White",21.96841215,"yes",NA
+"PC024","female",35,"White",24.43454119,"yes",NA
+"PC026","female",36,"White",27.88867845,"yes",NA
+"PC027","female",28,"White",52.93590734,"yes",NA
+"PC031","female",39,"White",29.19031142,"yes",NA
+"PC033","female",32,"More than One Race",33.09958333,"yes",NA
+"PC034","female",35,"White",19.46020761,"yes",NA
+"PC036","female",34,"White",40.93207101,"yes",NA
+"PC037","female",28,"Unknown or Not Responded",29.07830385,"yes",NA
+"PC039","female",27,"White",26.56840514,"yes",NA
+"PC041","female",41,"White",41.26485207,"yes",NA
+"PC042","female",31,"White",22.49458302,"yes",NA
+"PC043","female",35,"White",20.94653061,"yes",NA
+"PC044","female",35,"White",50.89663622,"yes",NA
+"PC045","female",32,"White",22.56184573,"yes",NA
+"PC046","female",34,"White",41.03932981,"yes",NA
+"PC048","female",37,"White",24.75925596,"yes",NA
+"PC049","female",34,"White",24.23197959,"yes",NA
+"PC052","female",43,"White",27.23781738,"yes",NA
+"PC053","female",36,"White",25.46680441,"yes",NA
+"PC055","female",31,"White",47.6079305,"yes",NA
+"PC057","female",38,"White",25.75730028,"yes",NA
+"PC058","female",20,"White",40.9437787,"yes",NA
+"PC059","female",38,"White",20.9904551,"yes",NA
+"PC060","female",40,"White",26.62878788,"yes",NA
+"PC061","female",27,"White",26.37228781,"yes",NA
+"PC062","female",31,"White",29.81228027,"yes",NA
+"PC063","female",30,"White",39.05555556,"yes",NA
+"PC068","female",31,"White",21.92470483,"yes",NA
+"PC069","female",35,"White",35.40603538,"yes",NA
+"PC070","female",42,"More than One Race",32.11337278,"yes",NA
+"PC071","female",33,"White",22.56255621,"yes",NA
+"PC073","female",27,"White",22.34883218,"yes",NA
+"PC075","female",26,"White",20.42407227,"yes",NA
+"PC076","female",38,"White",42.8732699,"yes",NA
+"PC078","female",31,"White",27.4609375,"yes",NA
+"PC080","female",31,"White",25.68279164,"yes",NA
+"PC081","female",34,"White",34.10901071,"yes",NA
+"PC082","female",28,"White",31.75170898,"yes",NA
+"PC085","female",34,"White",35.50505051,"yes",NA
+"PC086","female",21,"White",20.0496001,"yes",NA
+"PC087","female",37,"White",29.57154017,"yes",NA
+"PC088","female",36,"White",24.95857988,"yes",NA
+"PC089","female",28,"White",24.51123714,"yes",NA
+"PC092","female",39,"White",21.58866782,"yes",NA
+"DEV060","female",49,"American Indian or Alaskan Native",35.47997959,NA,"complete"
+"DEV083","male",20,"Asian",25.32303408,NA,"complete"
+"DEV021","female",30,"Black or African American",29.57590842,NA,"complete"
+"DEV091","female",22,"Black or African American",28.61086426,NA,"complete"
+"DEV001","male",26,"White",30.130456,NA,"complete"
+"DEV004","female",35,"White",25.93482553,NA,"complete"
+"DEV005","female",24,"White",26.58611741,NA,"complete"
+"DEV008","female",19,"White",34.14333728,NA,"complete"
+"DEV009","female",37,"White",36.27313609,NA,"complete"
+"DEV012","female",57,"White",29.90443447,NA,"complete"
+"DEV014","female",57,"White",28.67616528,NA,"complete"
+"DEV016","male",36,"White",32.53274099,NA,"complete"
+"DEV017","male",22,"White",29.64844277,NA,"complete"
+"DEV018","female",21,"White",33.36130178,NA,"complete"
+"DEV019","female",43,"White",24.24809776,NA,"complete"
+"DEV022","female",50,"White",40.1366782,NA,"complete"
+"DEV023","male",39,"White",30.74453333,NA,"complete"
+"DEV024","male",34,"White",28.51884547,NA,"complete"
+"DEV026","male",39,"White",34.41784575,NA,"complete"
+"DEV027","female",60,"White",26.58562012,NA,"complete"
+"DEV028","male",35,"White",36.47260494,NA,"complete"
+"DEV030","female",33,"White",32.39623669,NA,"complete"
+"DEV031","female",43,"White",25.38611111,NA,"complete"
+"DEV035","female",35,"White",29.84517511,NA,"complete"
+"DEV036","female",23,"White",29.2510607,NA,"complete"
+"DEV038","male",39,"White",25.5660349,NA,"complete"
+"DEV039","male",25,"White",34.48136889,NA,"complete"
+"DEV040","female",60,"White",29.79196511,NA,"complete"
+"DEV041","male",29,"White",28.88483796,NA,"complete"
+"DEV042","female",49,"White",39.27704264,NA,"complete"
+"DEV043","female",55,"White",26.79157715,NA,"complete"
+"DEV044","female",57,"White",27.28059701,NA,"complete"
+"DEV045","female",55,"White",41.48467365,NA,"complete"
+"DEV046","female",44,"White",33.82719527,NA,"complete"
+"DEV050","female",40,"White",32.68078512,NA,"complete"
+"DEV051","female",30,"White",25.64432966,NA,"complete"
+"DEV052","female",30,"White",29.09839553,NA,"complete"
+"DEV053","female",33,"White",25.22907106,NA,"complete"
+"DEV055","female",51,"White",43.82015621,NA,"complete"
+"DEV056","female",26,"White",30.13396936,NA,"complete"
+"DEV057","female",31,"White",33.04366229,NA,"complete"
+"DEV058","female",57,"White",24.79218935,NA,"complete"
+"DEV059","female",20,"White",25.04514991,NA,"complete"
+"DEV061","male",23,"White",33.62752663,NA,"complete"
+"DEV062","female",32,"White",25.90700592,NA,"complete"
+"DEV063","male",45,"White",40.31465566,NA,"complete"
+"DEV065","female",41,"White",30.03684562,NA,"complete"
+"DEV067","female",52,"White",31.79315886,NA,"complete"
+"DEV068","female",35,"White",35.51576483,NA,"complete"
+"DEV070","male",42,"White",29.9707551,NA,"complete"
+"DEV071","female",30,"White",32.26312426,NA,"complete"
+"DEV073","male",47,"White",33.88791906,NA,"complete"
+"DEV074","male",32,"White",35.3398534,NA,"complete"
+"DEV076","male",29,"White",40.84560185,NA,"complete"
+"DEV077","male",32,"White",26.48444898,NA,"complete"
+"DEV078","male",44,"White",37.69710145,NA,"complete"
+"DEV079","female",24,"White",25.07317898,NA,"complete"
+"DEV080","female",18,"White",42.6122299,NA,"complete"
+"DEV081","female",31,"White",31.88478503,NA,"complete"
+"DEV082","male",44,"White",25.69543111,NA,"complete"
+"DEV084","male",30,"White",37.32871901,NA,"complete"
+"DEV085","male",31,"White",41.19006122,NA,"complete"
+"DEV086","female",39,"White",30.93780992,NA,"complete"
+"DEV087","male",43,"White",28.62717978,NA,"complete"
+"DEV013","male",23,"Hispanic or Latino",29.03827855,NA,"complete"
+"DEV029","female",33,"Hispanic or Latino",39.93850098,NA,"complete"
+"DEV034","male",23,"Hispanic or Latino",30.00411678,NA,"complete"
+"DEV089","male",28,"Hispanic or Latino",24.57630612,NA,"complete"
+"DEV010","male",30,"More than One Race",35.92398334,NA,"complete"
+"DEV049","female",58,"More than One Race",37.23119174,NA,"complete"
+"DEV066","female",18,"More than One Race",29.61401203,NA,"complete"
+"DEV069","male",35,"More than One Race",31.60763408,NA,"complete"
+"DEV072","female",20,"More than One Race",28.04796168,NA,"complete"
+"DEV006","female",60,"Unknown or Not Responded",29.10170414,NA,"complete"
+"DEV015","female",45,"Unknown or Not Responded",30.01913641,NA,"complete"
+"DEV025","male",59,"Unknown or Not Responded",33.14142857,NA,"complete"
+"DEV033","male",37,"Unknown or Not Responded",27.20337838,NA,"complete"
+"DEV037","male",21,"Unknown or Not Responded",29.66465981,NA,"complete"
+"DEV048","female",27,"Unknown or Not Responded",27.32757853,NA,"complete"
+"DEV007",NA,NA,"Unknown or Not Responded",NA,NA,"complete"

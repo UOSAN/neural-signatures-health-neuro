@@ -1,0 +1,70 @@
+---
+title: "Motion exclusions"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# load packages
+```{r}
+library(tidyverse)
+```
+
+# load data
+```{r}
+motion = read.csv("~/Documents/code/sanlab/DEV_scripts/fMRI/fx/motion/auto-motion-fmriprep/summary/DEV_summaryRun.csv")
+```
+
+# summarize by task
+```{r}
+motion %>%
+  group_by(wave, task) %>%
+  summarize(median_motion = median(percent, na.rm = TRUE),
+            sd_motion = sd(percent, na.rm = TRUE))
+```
+
+# ROC
+```{r}
+motion %>%
+  filter(percent > 10 & wave == 1 & task == "ROC") %>%
+  group_by(subjectID, task) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n))
+
+motion %>%
+  filter(percent > 10 & wave == 1 & task == "ROC") %>%
+  group_by(subjectID, task) %>%
+  mutate(n = n()) %>%
+  filter(n == 1)
+```
+
+# WTP
+```{r}
+motion %>%
+  filter(percent > 10 & wave == 1 & task == "WTP") %>%
+  group_by(subjectID, task) %>%
+  summarize(n = n()) %>%
+  arrange(desc(n))
+
+motion %>%
+  filter(percent > 10 & wave == 1 & task == "WTP") %>%
+  group_by(subjectID, task) %>%
+  mutate(n = n()) %>%
+  filter(n == 1)
+```
+

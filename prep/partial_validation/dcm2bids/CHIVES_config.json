@@ -1,0 +1,67 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "SeriesDescription": "mprage"
+            }
+        },        
+        {
+            "dataType": "fmap",
+            "modalityLabel": "epi",
+            "customLabels": "dir-ap",
+            "criteria": {
+                "SeriesDescription": "se_epi_fieldmap_ap"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "epi",
+            "customLabels": "dir-pa",
+            "criteria": {
+                "SeriesDescription": "se_epi_fieldmap_pa"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-money",
+            "criteria": {
+                "SeriesDescription": "money"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-picture_acq-1",
+            "criteria": {
+                "SeriesDescription": "picture_1"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-picture_acq-2",
+            "criteria": {
+                "SeriesDescription": "picture_2"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-words_acq-1",
+            "criteria": {
+                "SeriesDescription": "words_1"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-words_acq-2",
+            "criteria": {
+                "SeriesDescription": "words_2"
+            }
+        }
+    ]
+}

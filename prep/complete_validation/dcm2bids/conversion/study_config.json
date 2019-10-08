@@ -1,0 +1,115 @@
+{
+    "descriptions": [
+        {
+            "dataType": "anat",
+            "modalityLabel": "T1w",
+            "criteria": {
+                "SeriesDescription": "mprage"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-rest_acq-1",
+            "criteria": {
+                "SeriesDescription": "Resting_1"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-rest_acq-2",
+            "criteria": {
+                "SeriesDescription": "Resting_2"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-ROC_acq-1",
+            "criteria": {
+                "SeriesDescription": "ROC1"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-ROC_acq-2",
+            "criteria": {
+                "SeriesDescription": "ROC2"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-ROC_acq-3",
+            "criteria": {
+                "SeriesDescription": "ROC3"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-ROC_acq-4",
+            "criteria": {
+                "SeriesDescription": "ROC4"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-WTP_acq-1",
+            "criteria": {
+                "SeriesDescription": "WTP1"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-WTP_acq-2",
+            "criteria": {
+                "SeriesDescription": "WTP2"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-WTP_acq-3",
+            "criteria": {
+                "SeriesDescription": "WTP3"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-WTP_acq-4",
+            "criteria": {
+                "SeriesDescription": "WTP4"
+            }
+        },
+        {
+            "dataType": "func",
+            "modalityLabel": "bold",
+            "customLabels": "task-SST_acq-1",
+            "criteria": {
+                "SeriesDescription": "SST1"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "epi",
+            "customLabels": "dir-ap",
+            "criteria": {
+                "SeriesDescription": "se_epi_fieldmap_ap"
+            }
+        },
+        {
+            "dataType": "fmap",
+            "modalityLabel": "epi",
+            "customLabels": "dir-pa",
+            "criteria": {
+                "SeriesDescription": "se_epi_fieldmap_pa"
+            }
+        }
+    ]
+}

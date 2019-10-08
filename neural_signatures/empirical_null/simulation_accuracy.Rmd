@@ -1,0 +1,180 @@
+---
+title: "Simulated accuracy"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.path = "figs/", dpi = 300, colormodel = "cmyk")
+options(scipen = 999)
+```
+
+# load packages
+```{r}
+library(tidyverse)
+library(caret)
+library(ROCR)
+library(broom)
+library(knitr)
+```
+
+# define color palettes
+```{r}
+algorithm = c("#006989", "#FEC601", "#F43C13", "#00A5CF", "#00A878")
+instruction = wesanderson::wes_palette("Darjeeling1", 2, "continuous")
+craving = c("#F2AD00", "#FF0000")
+rating = c("#F2AD00", "#F28D00", "#F26000", "#FF3911", "#D30000")
+dc_bw = readRDS("~/dc_bw.Rds") +
+    theme(text = element_text(size = 13, family = "Futura Medium"))
+```
+
+# load and tidy data
+```{r}
+partial = readRDS("../../CR_analyses/CR_partial_validation.RDS") %>%
+  mutate(sample = "partial validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+complete = readRDS("../../CR_analyses/CR_complete_validation.RDS") %>%
+  mutate(sample = "complete validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+partial.null = readRDS("CR_partial_validation_random.RDS") %>%
+  mutate(sample = "partial validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+complete.null = readRDS("CR_complete_validation_random.RDS") %>%
+  mutate(sample = "complete validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+data.null = bind_rows(partial, complete, partial.null, complete.null) %>%
+  arrange(subjectID, trial) %>%
+  filter(!is.na(rating)) %>%
+  filter(!algorithm == "regulate > rest") %>%
+  mutate(sample = factor(sample, levels = c("partial validation", "complete validation")),
+         type = ifelse(grepl("logistic|multivariate", algorithm), "multivariate", "univariate"),
+         algorithm = gsub("univariate", "random univariate", algorithm),
+         algorithm = gsub("multivariate", "random multivariate", algorithm),
+         algorithm = gsub("variate(\\1)", "variate \\2", algorithm))
+```
+
+# compare to empirical chance accuracy
+## table
+```{r, fig.width=9, fig.height=5}
+data.null %>%
+  select(sample, subjectID, trial, type, algorithm, instruction, rating, dotSTD) %>%
+  mutate(guess.instruction = ifelse(dotSTD > 0, "regulate", "look"),
+         instruction = as.factor(instruction),
+         guess.instruction = as.factor(guess.instruction)) %>%
+  ungroup() %>%
+  nest(-c(sample, algorithm, type)) %>% 
+  mutate(
+    test = map(data, ~ caret::confusionMatrix(.$guess.instruction, .$instruction)),
+    tidied = map(test, broom::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(term %in% c("accuracy")) %>%
+  spread(term, estimate) %>%
+  group_by(sample, algorithm) %>%
+  fill(everything(), .direction = "up") %>%
+  fill(everything(), .direction = "down") %>%
+  unique() %>%
+  ungroup() %>%
+  select(sample, type, algorithm, accuracy) %>%
+  mutate(algorithm = as.character(algorithm),
+         algorithm = ifelse(grepl("multivariate", algorithm), "random multivariate",
+                     ifelse(grepl("univariate", algorithm), "random univariate", algorithm))) %>%
+  filter(grepl("variate", algorithm)) %>%
+  group_by(sample, algorithm) %>%
+  summarize(n = n(),
+            minAccuracy = min(accuracy),
+            maxAccuracy = max(accuracy),
+            meanAccuracy = mean(accuracy),
+            sdAccuracy = sd(accuracy),
+            seAccuracy = sdAccuracy / sqrt(n),
+            lowerCI = meanAccuracy - (1.96*seAccuracy),
+            upperCI = meanAccuracy + (1.96*seAccuracy)) %>%
+  mutate(meanCI = sprintf("%.2f [%.2f, %.2f]", meanAccuracy, lowerCI, upperCI),
+         range = sprintf("%.2f - %.2f", minAccuracy, maxAccuracy)) %>%
+  ungroup() %>%
+  select(sample, algorithm, meanCI, range) %>%
+  rename("Sample" = sample,
+         "Signature Type" = algorithm,
+         "M [95% CI]" = meanCI) %>%
+  kable(format = "pandoc")
+```
+
+## accuracy distribution
+```{r, fig.width=9, fig.height=5}
+data.null %>%
+  select(sample, subjectID, trial, type, algorithm, instruction, rating, dotSTD) %>%
+  mutate(guess.instruction = ifelse(dotSTD > 0, "regulate", "look"),
+         instruction = as.factor(instruction),
+         guess.instruction = as.factor(guess.instruction)) %>%
+  ungroup() %>%
+  nest(-c(sample, algorithm, type)) %>% 
+  mutate(
+    test = map(data, ~ caret::confusionMatrix(.$guess.instruction, .$instruction)),
+    tidied = map(test, broom::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(term %in% c("accuracy")) %>%
+  spread(term, estimate) %>%
+  group_by(sample, algorithm) %>%
+  fill(everything(), .direction = "up") %>%
+  fill(everything(), .direction = "down") %>%
+  unique() %>%
+  ungroup() %>%
+  select(sample, type, algorithm, accuracy) %>%
+  mutate(algorithm = as.character(algorithm),
+         algorithm = ifelse(grepl("multivariate", algorithm), "random multivariate",
+                     ifelse(grepl("univariate", algorithm), "random univariate", algorithm))) %>%
+  filter(grepl("variate", algorithm)) %>%
+  ggplot(aes(accuracy, fill = sample)) + 
+    geom_density(color = NA, alpha = .5) +
+    scale_fill_manual(name = "", values = craving) +
+    facet_grid(~type) +
+    dc_bw +
+    theme(legend.position = "top")
+```
+
+## ROC curve
+```{r, fig.width=9, fig.height=5}
+data.null %>%
+  mutate(instruction = ifelse(instruction == "regulate", 1, 0)) %>%
+  group_by(sample, algorithm) %>%
+  do({
+    sample = .$sample
+    algorithm = .$algorithm
+    pred = ROCR::prediction(.$dotSTD, .$instruction)
+    perf = ROCR::performance(pred, measure = "tpr", x.measure = "fpr")
+    data.frame(cut = perf@alpha.values[[1]],fpr = perf@x.values[[1]],tpr = perf@y.values[[1]])
+  }) %>%
+  mutate(color_key = ifelse(grepl("random", algorithm), "random pattern",
+                     ifelse(grepl("logistic", algorithm), "multivariate classifier", "univariate contrast")),
+         color_key = factor(color_key, c("multivariate classifier", "univariate contrast", "random pattern")),
+         type = ifelse(grepl("multivariate|logistic", algorithm), "multivariate", "univariate")) %>%
+  ggplot(aes(fpr, tpr, color = color_key)) +
+    geom_line(aes(group = interaction(algorithm, sample), alpha = color_key)) +
+    geom_abline(intercept = 0, slope = 1) +
+    facet_grid(~sample) + 
+    scale_color_manual(name = "", values = c(algorithm[1], algorithm[2], "grey50")) +
+    scale_alpha_manual(values = c(1, 1, .2), guide = FALSE) +
+    labs(x = "\nfalse positive rate (1 - specificity)", y = "true positive rate (sensitivity)\n") +
+    dc_bw +
+    theme(legend.position = c(.9, .2),
+          legend.spacing.y = unit(-.1, "cm"),
+          legend.text = element_text(size = 8))
+```
+

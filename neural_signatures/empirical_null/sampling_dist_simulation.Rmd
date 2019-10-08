@@ -1,0 +1,130 @@
+---
+title: "Neural Signature Sampling Distribution Simulation"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    highlight: tango
+    theme: united
+    toc: true
+    toc_float: 
+      collapsed: TRUE
+      smooth_scroll: TRUE
+    df_print: paged
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+```
+
+# load libraries
+```{r}
+library(tidyverse)
+library(neurobase)
+```
+
+# run simulations
+## multivariate signatures
+```{r, fig.width = 8, fig.height = 8}
+# load neural signature
+multivariate = neurobase::readnii("../multivariate.nii.gz")
+
+# run simulation
+minVal = min(multivariate) #minVal = -0.005309167
+maxVal = max(multivariate) #maxVal = -0.005309167
+meanVal = (minVal + maxVal) / 2
+nVoxels = length(multivariate[!multivariate == 0]) #nVoxels = 224868
+
+tmp = data.frame()
+dfMulti = data.frame()
+
+for (i in c(25, 50, 75, 100, 150)){
+  for (j in 1:5){
+    for (k in 1:i){
+      multi_new = multivariate
+      multi_new[!multi_new == 0] = runif(nVoxels, minVal, maxVal) - meanVal
+      tmp[k,1] = mean(multi_new)
+      tmp[k,2] = sd(multi_new)
+      tmp[k,3] = sprintf("sample %s", j)
+      tmp[k,4] = i
+    }
+    dfMulti = rbind(dfMulti, tmp)
+  }
+}
+
+# raw data
+dfMulti %>%
+  mutate(V4 = sprintf("N = %d", V4),
+         V4 = factor(V4, levels = c("N = 25", "N = 50", "N = 75", "N = 100", "N = 150"))) %>%
+  ggplot(aes(V1)) +
+  geom_histogram(bins = 10, alpha = .7) +
+  facet_wrap(~V4 + V3, ncol = 5) +
+  labs(x = "\nmean", y = "count\n") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# density
+dfMulti %>%
+  mutate(V4 = sprintf("N = %d", V4),
+         V4 = factor(V4, levels = c("N = 25", "N = 50", "N = 75", "N = 100", "N = 150"))) %>%
+  ggplot(aes(V1)) +
+  geom_histogram(aes(y = ..density..), alpha = .7, bins = 10) +
+  geom_density(alpha = .2, fill = "#EBCC2A") +
+  facet_wrap(~V4 + V3, ncol = 5) +
+  labs(x = "\nmean", y = "density\n") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## univariate signatures
+```{r, fig.width = 8, fig.height = 8}
+# load neural signature
+univariate = neurobase::readnii("../univariate_regulate_look.nii.gz")
+
+# run simulation
+minVal = min(univariate) #minVal = -13.51153
+maxVal = max(univariate) #maxVal = 14.42019
+meanVal = (minVal + maxVal) / 2
+nVoxels = length(univariate[!univariate == 0]) #nVoxels = 228328
+
+tmp = data.frame()
+dfUni = data.frame()
+
+for (i in c(25, 50, 75, 100, 150)){
+  for (j in 1:5){
+    for (k in 1:i){
+      uni_new = univariate
+      uni_new[!uni_new == 0] = runif(nVoxels, minVal, maxVal) - meanVal
+      tmp[k,1] = mean(uni_new)
+      tmp[k,2] = sd(uni_new)
+      tmp[k,3] = sprintf("sample %s", j)
+      tmp[k,4] = i
+    }
+    dfUni = rbind(dfUni, tmp)
+  }
+}
+
+# raw data
+dfUni %>%
+  mutate(V4 = sprintf("N = %d", V4),
+         V4 = factor(V4, levels = c("N = 25", "N = 50", "N = 75", "N = 100", "N = 150"))) %>%
+  ggplot(aes(V1)) +
+  geom_histogram(bins = 10, alpha = .7) +
+  facet_wrap(~V4 + V3, ncol = 5) +
+  labs(x = "\nmean", y = "count\n") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+# density
+dfUni %>%
+  mutate(V4 = sprintf("N = %d", V4),
+         V4 = factor(V4, levels = c("N = 25", "N = 50", "N = 75", "N = 100", "N = 150"))) %>%
+  ggplot(aes(V1)) +
+  geom_histogram(aes(y = ..density..), alpha = .7, bins = 10) +
+  geom_density(alpha = .2, fill = "#EBCC2A") +
+  facet_wrap(~V4 + V3, ncol = 5) +
+  labs(x = "\nmean", y = "density\n") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```

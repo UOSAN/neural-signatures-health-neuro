@@ -1,0 +1,1048 @@
+---
+title: "CR analyses"
+author: "Dani Cosme"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    code_folding: show
+    df_print: paged
+    highlight: tango
+    theme: united
+    toc: yes
+    toc_float:
+      collapsed: yes
+      smooth_scroll: yes
+  pdf_document:
+    toc: yes
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, fig.path = "figs/", dpi = 300, colormodel = "cmyk")
+options(scipen = 999)
+```
+
+# load packages
+```{r}
+library(tidyverse)
+library(lme4)
+library(lmerTest)
+library(knitr)
+library(MuMIn)
+library(cowplot)
+library(caret)
+library(ROCR)
+library(broom)
+library(scales)
+```
+
+# define color palettes
+```{r}
+algorithm = c("#006989", "#FEC601", "#F43C13", "#00A5CF", "#00A878")
+instruction = wesanderson::wes_palette("Darjeeling1", 2, "continuous")
+craving = c("#F2AD00", "#FF0000")
+rating = c("#F2AD00", "#F28D00", "#F26000", "#FF3911", "#D30000")
+dc_bw = readRDS("~/dc_bw.Rds") +
+    theme(text = element_text(size = 13, family = "Futura Medium"))
+
+```
+
+# load and tidy data
+```{r}
+partial = readRDS("CR_partial_validation.RDS") %>%
+  mutate(sample = "partial validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+complete = readRDS("CR_complete_validation.RDS") %>%
+  mutate(sample = "complete validation") %>%
+  select(sample, subjectID, run, trial, instruction, craving, rating, rt, algorithm, dotProduct, dotSTD)
+
+data = bind_rows(partial, complete) %>%
+  filter(!algorithm == "regulate > rest") %>%
+  arrange(subjectID, trial) %>%
+  filter(!is.na(rating)) %>%
+  mutate(sample = factor(sample, levels = c("partial validation", "complete validation")),
+         type = ifelse(grepl("logistic", algorithm), "multivariate", "univariate"))
+```
+
+# descriptives
+## number of participants
+```{r}
+data %>%
+  select(sample, subjectID) %>%
+  unique() %>%
+  group_by(sample) %>%
+  summarize(n = n())
+```
+
+## ratings
+```{r}
+data %>%
+  filter(algorithm == "logistic classifier") %>%
+  group_by(sample, instruction) %>%
+  summarize(n = n(),
+            mean = round(mean(rating, na.rm = TRUE), 2),
+            sd = round(sd(rating, na.rm = TRUE), 2),
+            min = min(rating, na.rm = TRUE),
+            max = max(rating, na.rm = TRUE))
+
+data %>%
+  filter(algorithm == "logistic classifier") %>%
+  group_by(sample, instruction) %>%
+  summarize(n = n(),
+            mean = round(mean(rating, na.rm = TRUE), 2),
+            sd = round(sd(rating, na.rm = TRUE), 2)) %>%
+  gather(variable, value, mean, sd, n) %>%
+  unite(sample, c(sample, variable), sep = " ") %>%
+  spread(sample, value) %>%
+  kable(format = "pandoc")
+```
+
+## pattern expression values
+```{r, fig.width=7, fig.height=7.5}
+data %>%
+  group_by(sample, type, instruction) %>%
+  summarize(n = n(),
+            mean = round(mean(dotSTD, na.rm = TRUE), 2),
+            sd = round(sd(dotSTD, na.rm = TRUE), 2),
+            se = sd / sqrt(n - 1),
+            min = min(dotSTD, na.rm = TRUE),
+            max = max(dotSTD, na.rm = TRUE))
+
+data %>%
+  group_by(sample, type, instruction) %>%
+  summarize(n = n(),
+            mean = round(mean(dotSTD, na.rm = TRUE), 2),
+            sd = round(sd(dotSTD, na.rm = TRUE), 2)) %>%
+  gather(variable, value, mean, sd) %>%
+  unite(type, c(type, variable), sep = " ") %>%
+  spread(type, value) %>%
+  group_by(sample, instruction) %>%
+  fill(everything(), .direction = "up") %>%
+  fill(everything(), .direction = "down") %>%
+  unique() %>%
+  kable(format = "pandoc")
+
+# plots
+a = data %>%
+  group_by(instruction, sample, algorithm) %>%
+  mutate(mean = mean(dotSTD, na.rm = TRUE)) %>%
+  ggplot(aes(dotSTD, fill = instruction)) +
+    geom_vline(aes(xintercept = mean, color = instruction), alpha = .7) +
+    geom_density(color = NA, alpha = .7) +
+    facet_grid(sample~type, scales = "free_x") +
+    scale_fill_manual(name = "", values = instruction) + 
+    scale_color_manual(name = "", values = instruction) + 
+    scale_y_continuous(expand = c(0, 0), breaks = scales::pretty_breaks(3)) +
+    scale_x_continuous(breaks = scales::pretty_breaks(4)) +
+    labs(x = "\nstandardized regulation PEV", y = "density\n") + 
+    dc_bw +
+    theme(legend.position = c(.5, .915))
+
+b = data %>%
+  group_by(algorithm, subjectID, instruction) %>%
+  mutate(meanPEV = mean(dotSTD, na.rm = TRUE)) %>%
+  group_by(instruction, sample, algorithm) %>%
+  mutate(mean = mean(meanPEV, na.rm = TRUE)) %>%
+  ggplot(aes(meanPEV, fill = instruction)) +
+    geom_vline(aes(xintercept = mean, color = instruction), alpha = .7) +
+    geom_density(color = NA, alpha = .7) +
+    facet_grid(sample~type, scales = "free_x") +
+    scale_fill_manual(name = "", values = instruction) + 
+    scale_color_manual(name = "", values = instruction) + 
+    scale_y_continuous(expand = c(0, 0), breaks = scales::pretty_breaks(3)) +
+    scale_x_continuous(breaks = scales::pretty_breaks(4)) +
+    labs(x = "\nparticipant mean standardized regulation PEV", y = "density\n") + 
+    dc_bw +
+    theme(legend.position = "none")
+
+plot_grid(a, b, ncol = 1, align = "v", labels = c('A', 'B'))
+plot.dist = plot_grid(a, b, ncol = 2, align = "v", labels = c('A', 'B'))
+```
+
+* `rmcorr` messes with the `lmer` models, so it is commented out here to avoid that issue
+```{r}
+# correlations
+# data %>%
+#   select(sample, subjectID, trial, type, dotSTD) %>%
+#   spread(type, dotSTD) %>%
+#   mutate(subjectID = as.factor(subjectID)) %>%
+#   unique() %>%
+#   ungroup() %>%
+#   nest(-c(sample)) %>% 
+#   mutate(multivariate_univariate = map(data, ~ rmcorr::rmcorr(subjectID, multivariate, univariate, .))) %>%
+#   gather(test, model, contains("variate")) %>%
+#   group_by(sample, test) %>%
+#   mutate(r = sprintf("%s [%s, %s]", round(model[[1]][[1]], 2), round(model[[1]][[4]][1], 2), round(model[[1]][[4]][2], 2)),
+#          df = model[[1]][[2]],
+#          p = round(model[[1]][[3]], 3),
+#          p = ifelse(p == 0, "< .001", as.character(p))) %>%
+#   ungroup() %>%
+#   select(sample, test, r, df) %>%
+#   extract(test, c("var1", "var2"), "(.*)_(.*)") %>%
+#   spread(var1, r) %>%
+#   select(sample, var2, df, everything()) %>%
+#   kable(format = 'pandoc')
+```
+
+# accuracy and roc curves
+```{r, fig.width=5.5, fig.height=5}
+# accuracy
+data %>%
+  select(sample, subjectID, trial, type, instruction, rating, dotSTD) %>%
+  mutate(guess.instruction = ifelse(dotSTD > 0, "regulate", "look"),
+         instruction = as.factor(instruction),
+         guess.instruction = as.factor(guess.instruction)) %>%
+  ungroup() %>%
+  nest(-c(sample, type)) %>% 
+  mutate(
+    test = map(data, ~ confusionMatrix(.$guess.instruction, .$instruction)),
+    tidied = map(test, broom::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE)
+
+# table
+data %>%
+  select(sample, subjectID, trial, type, instruction, rating, dotSTD) %>%
+  mutate(guess.instruction = ifelse(dotSTD > 0, "regulate", "look"),
+         instruction = as.factor(instruction),
+         guess.instruction = as.factor(guess.instruction)) %>%
+  ungroup() %>%
+  nest(-c(sample, type)) %>% 
+  mutate(
+    test = map(data, ~ confusionMatrix(.$guess.instruction, .$instruction)),
+    tidied = map(test, broom::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(term %in% c("accuracy", "balanced_accuracy", "specificity", "sensitivity")) %>%
+  spread(term, estimate) %>%
+  group_by(sample, type) %>%
+  fill(everything(), .direction = "up") %>%
+  fill(everything(), .direction = "down") %>%
+  unique() %>%
+  rename(`balanced accuracy` = balanced_accuracy,
+         "p" = p.value) %>%
+  mutate(`balanced accuracy` = round(`balanced accuracy`, 2),
+         sensitivity = round(sensitivity, 2),
+         specificity = round(specificity, 2),
+         accuracy = sprintf('%s [%s, %s]', round(accuracy, 2), round(conf.low, 2), round(conf.high, 2)),
+         p = round(p, 3),
+         p = ifelse(p == 0, "< .001", as.character(p))) %>%
+  select(sample, type, `balanced accuracy`, sensitivity, specificity, accuracy, p) %>%
+  kable(format = "pandoc")
+
+# roc curve
+data %>%
+  mutate(instruction = ifelse(instruction == "regulate", 1, 0)) %>%
+  group_by(sample, type) %>%
+  do({
+    sample = .$sample
+    type = .$type
+    pred = prediction(.$dotSTD, .$instruction)
+    perf = performance(pred, measure = "tpr", x.measure = "fpr")
+    data.frame(cut = perf@alpha.values[[1]],fpr = perf@x.values[[1]],tpr = perf@y.values[[1]])
+  }) %>%
+  ggplot(aes(fpr, tpr, color = type, linetype = sample)) +
+    geom_line() +
+    geom_abline(intercept = 0, slope = 1) +
+    scale_color_manual(name = "", values = algorithm) +
+    scale_linetype_manual(name =  "", values = c("dotted", "solid")) +
+    labs(x = "\nfalse positive rate (1 - specificity)", y = "true positive rate (sensitivity)\n") +
+    dc_bw +
+    theme(legend.position = c(.8, .3),
+          legend.spacing.y = unit(-.1, "cm"))
+```
+
+# visualize
+## instruction
+```{r, fig.width=7, fig.height=8}
+a = data %>%
+  ggplot(aes(instruction, dotSTD, fill = instruction, alpha = sample)) +
+    stat_summary(fun.y = mean, geom = "bar", position = position_dodge(width = 0.95)) +
+    stat_summary(fun.data = mean_cl_boot, geom = "errorbar", position = position_dodge(width = 0.95), width = 0) +
+    facet_grid(~type) +
+    scale_fill_manual(name = "", values = instruction) + 
+    scale_alpha_discrete(name = "", range = c(.6, 1)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = c(.775, .925),
+          legend.box = "horizontal",
+          text = element_text(size = 12),
+          legend.spacing.x = unit(0.1, 'cm'))
+  
+b = data %>%
+  filter(!is.na(rating)) %>%
+  ggplot(aes(instruction, dotSTD)) +
+    stat_summary(aes(group = subjectID), fun.y = mean, geom = "line", alpha = .2, size = .25) +
+    stat_summary(aes(group = 1), fun.y = mean, geom = "line", size = .75) +
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot,  geom = "linerange", size = .5) + 
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot,  geom = "point", size = 1) + 
+    facet_grid(sample~type) +
+    scale_color_manual(name = "", values = instruction) +
+    coord_cartesian(ylim = c(-1, 1.25)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = "none")
+
+plot_grid(a, b, ncol = 1, align = "v", labels = c('A', 'B'))
+```
+
+### swapped
+```{r, fig.width=7, fig.height=8}
+a = data %>%
+  ggplot(aes(sample, dotSTD, fill = instruction)) +
+    stat_summary(fun.y = mean, geom = "bar", position = position_dodge(width = 0.95)) +
+    stat_summary(fun.data = mean_cl_boot, geom = "errorbar", position = position_dodge(width = 0.95), width = 0) +
+    facet_grid(~type) +
+    scale_fill_manual(name = "", values = instruction) + 
+    scale_alpha_discrete(name = "", range = c(.6, 1)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = c(.91, .925),
+          legend.box = "horizontal",
+          text = element_text(size = 12),
+          legend.spacing.x = unit(0.1, 'cm'))
+  
+b = data %>%
+  filter(!is.na(rating)) %>%
+  ggplot(aes(instruction, dotSTD)) +
+    stat_summary(aes(group = subjectID), fun.y = mean, geom = "line", alpha = .2, size = .25) +
+    stat_summary(aes(group = 1), fun.y = mean, geom = "line", size = .75) +
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot,  geom = "linerange", size = .5) + 
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot,  geom = "point", size = 1) + 
+    facet_grid(sample~type) +
+    scale_color_manual(name = "", values = instruction) +
+    coord_cartesian(ylim = c(-1, 1.25)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = "none")
+
+plot_grid(a, b, ncol = 1, align = "v", labels = c('A', 'B'))
+```
+
+## rating
+```{r, fig.width=10, fig.height=9}
+a = data %>%
+  group_by(sample, rating, type) %>%
+  mutate(n.obs = n()) %>%
+  ggplot(aes(as.factor(rating), dotSTD, color = type)) +
+    stat_summary(aes(group = type), fun.y = mean, geom = "line") +
+    stat_summary(fun.data = mean_cl_boot, geom = "linerange") +
+    stat_summary(aes(size = n.obs), fun.y = mean, geom = "point") +
+    scale_color_manual(name = "", values = algorithm) + 
+    scale_size(name = "", range = c(.5,3), breaks = c(300, 600, 900)) + 
+    facet_grid(~sample, scales = "free_x") + 
+    labs(x = "\ncraving rating", y = "standardized regulation PEV\n") + 
+    dc_bw
+
+b = data %>%
+  mutate(rating.bin = ifelse(sample == "partial validation" & rating > 3, "high", 
+                      ifelse(sample == "partial validation" & rating < 3, "low",
+                      ifelse(sample == "complete validation" & rating >= 3, "high",
+                      ifelse(sample == "complete validation" & rating < 3, "low", NA)))),
+         rating.bin = factor(rating.bin, levels = c("low", "high"))) %>%
+  filter(!is.na(rating.bin)) %>%
+  ggplot(aes(rating.bin, dotSTD)) +
+    stat_summary(aes(group = subjectID), fun.y = mean, geom = "line", alpha = .1, size = .5) +
+    stat_summary(aes(group = 1), fun.y = mean, geom = "line", size = .75) +
+    stat_summary(aes(color = rating.bin), fun.data = mean_cl_boot, geom = "pointrange", width = 0) + 
+    facet_grid(sample~type) +
+    scale_color_manual(name = "", values = craving) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    coord_cartesian(ylim = c(-1.25, 1.75)) + 
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = "none")
+
+c = data %>%
+  mutate(rating.bin = ifelse(sample == "partial validation" & rating > 3, "high", 
+                      ifelse(sample == "partial validation" & rating < 3, "low",
+                      ifelse(sample == "complete validation" & rating >= 3, "high",
+                      ifelse(sample == "complete validation" & rating < 3, "low", NA)))),
+         rating.bin = factor(rating.bin, levels = c("low", "high"))) %>%
+  filter(!is.na(rating.bin)) %>%
+  ggplot(aes(rating.bin, dotSTD)) +
+    stat_summary(aes(group = interaction(subjectID, instruction), color = instruction), fun.y = mean, geom = "line", alpha = .1, size = .5) +
+    stat_summary(aes(group = instruction, color = instruction), fun.y = mean, geom = "line", size = .75) +
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot, geom = "pointrange", width = 0) + 
+    facet_grid(sample~type) +
+    scale_color_manual(name = "", values = instruction) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    coord_cartesian(ylim = c(-1.25, 1.75)) + 
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = c(.86, .94))
+
+bottom_row = plot_grid(b, c, labels = c('B', 'C'), align = 'h', rel_widths = c(1, 1))
+plot_grid(a, bottom_row, labels = c('A', ''), ncol = 1, rel_heights = c(1, 1))
+```
+
+### swapped
+```{r, fig.width=12, fig.height=10}
+a = data %>%
+  group_by(sample, rating, algorithm) %>%
+  mutate(n.obs = n()) %>%
+  ungroup() %>%
+  ggplot(aes(rating, dotSTD, color = type)) +
+    stat_summary(aes(group = interaction(type, sample), linetype = sample), fun.y = mean, geom = "line") +
+    stat_summary(aes(group = interaction(type, sample)), fun.data = mean_cl_boot, geom = "linerange") +
+    stat_summary(aes(group = interaction(type, sample), size = n.obs), fun.y = mean, geom = "point") +
+    scale_color_manual(name = "", values = algorithm) + 
+    scale_linetype_manual(name = "", values = c("dotted", "solid")) + 
+    scale_size(name = "", range = c(.5,3), breaks = c(400, 800)) + 
+    labs(x = "", y = "standardized regulation PEV\n") + 
+    dc_bw +
+    theme(legend.position = "top",
+          legend.box = "horizontal") +
+    guides(color = guide_legend(nrow = 2, byrow = TRUE),
+           linetype = guide_legend(nrow = 2, byrow = TRUE),
+           size = guide_legend(nrow = 2, byrow = TRUE))
+
+b = data %>%
+  mutate(rating = as.factor(rating)) %>%
+  ggplot(aes(instruction, dotSTD)) +
+    stat_summary(aes(group = rating, color = rating), fun.y = mean, geom = "line") +
+    stat_summary(aes(color = rating), fun.data = mean_cl_boot, geom = "linerange") + 
+    stat_summary(aes(color = rating), fun.data = mean_cl_boot, geom = "point") + 
+    facet_grid(sample~type, scales = "free") +
+    scale_color_manual(name = "", values = rating) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    labs(y = "standarized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = "top",
+          legend.box = "horizontal")
+
+c = data %>%
+  mutate(rating.bin = ifelse(sample == "partial validation" & rating > 3, "high", 
+                      ifelse(sample == "partial validation" & rating < 3, "low",
+                      ifelse(sample == "complete validation" & rating >= 3, "high",
+                      ifelse(sample == "complete validation" & rating < 3, "low", NA)))),
+         rating.bin = factor(rating.bin, levels = c("low", "high"))) %>%
+  filter(!is.na(rating.bin)) %>%
+  ggplot(aes(sample, dotSTD, fill = rating.bin)) +
+    stat_summary(fun.y = mean, geom = "bar", position = position_dodge(width = 0.95)) +
+    stat_summary(fun.data = mean_cl_boot, geom = "errorbar", position = position_dodge(width = 0.95), width = 0) +
+    facet_grid(~type) +
+    scale_fill_manual(name = "", values = craving) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = c(.94, .125),
+          legend.box = "horizontal",
+          text = element_text(size = 12),
+          legend.spacing.x = unit(0.1, 'cm'))
+
+d.data = data %>%
+  mutate(rating.bin = ifelse(sample == "partial validation" & rating > 3, "high", 
+                      ifelse(sample == "partial validation" & rating < 3, "low",
+                      ifelse(sample == "complete validation" & rating >= 3, "high",
+                      ifelse(sample == "complete validation" & rating < 3, "low", NA)))),
+         rating.bin = factor(rating.bin, levels = c("low", "high"))) %>%
+  filter(!is.na(rating.bin))
+
+d.scales = list(
+  `partial validation` = scale_y_continuous(limits = c(-1.5, 2.25)),
+  `complete validation` = scale_y_continuous(limits = c(-1.25, 1.75))
+)
+
+d = d.data %>%
+  ggplot(aes(rating.bin, dotSTD)) +
+    stat_summary(aes(group = interaction(subjectID, instruction), color = instruction), fun.y = mean, geom = "line", alpha = .2, size = .25) +
+    stat_summary(aes(group = instruction, color = instruction), fun.y = mean, geom = "line", size = .75) +
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot, geom = "linerange", size = .5) + 
+    stat_summary(aes(color = instruction), fun.data = mean_cl_boot, geom = "point", size = 1) + 
+    facetscales::facet_grid_sc(sample~type, scales = list(y = d.scales)) +
+    scale_color_manual(name = "", values = instruction) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    labs(y = "standardized regulation PEV\n", x = "") + 
+    dc_bw +
+    theme(legend.position = c(.86, .94))
+
+plot_grid(a, b, c, d, labels = c('A', 'B', 'C', 'D'), nrow = 2, rel_widths = c(1, 1))
+```
+
+# instruction and rating effects
+```{r}
+fit_mod = function(data){
+    mod = lmer(dotSTD ~ instruction + (1 | subjectID), data = data)
+    return(mod)
+}
+
+data %>%
+  nest(-c(sample, type)) %>%
+  mutate(
+    test = map(data, fit_mod),
+    tidied = map(test, broom.mixed::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(effect == "fixed")  %>%
+  mutate(`b [95% CI]` = sprintf("%.2f [%.2f, %.2f]", estimate, estimate - (1.96 * std.error), estimate + (1.96 * std.error)),
+         term = gsub("\\(Intercept\\)", "intercept", term),
+         term = gsub("instructionregulate", "instruction", term)) %>%
+  select(sample, type, term, df, `b [95% CI]`) %>%
+  rename("Sample" = sample,
+         "Signature Type" = type) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+```{r}
+fit_mod = function(data){
+    mod = lmer(dotSTD ~ rating_c + (1 | subjectID), data = data)
+    return(mod)
+}
+
+data %>%
+  group_by(subjectID, type) %>%
+  mutate(rating_c = rating - mean(rating, na.rm = TRUE)) %>%
+  ungroup() %>%
+  nest(-c(sample, type)) %>%
+  mutate(
+    test = map(data, fit_mod),
+    tidied = map(test, broom.mixed::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(effect == "fixed")  %>%
+  mutate(`b [95% CI]` = sprintf("%.2f [%.2f, %.2f]", estimate, estimate - (1.96 * std.error), estimate + (1.96 * std.error)),
+         term = gsub("\\(Intercept\\)", "intercept", term),
+         term = gsub("rating_c", "rating", term)) %>%
+  select(sample, type, term, df, `b [95% CI]`) %>%
+  rename("Sample" = sample,
+         "Signature Type" = type) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+```{r}
+fit_mod = function(data){
+    mod = lmer(dotSTD ~ instruction*rating_c + (1 | subjectID), data = data)
+    return(mod)
+}
+
+data %>%
+  group_by(subjectID, type) %>%
+  mutate(rating_c = rating - mean(rating, na.rm = TRUE)) %>%
+  ungroup() %>%
+  nest(-c(sample, type)) %>%
+  mutate(
+    test = map(data, fit_mod),
+    tidied = map(test, broom.mixed::tidy)
+  ) %>% 
+  unnest(tidied, .drop = TRUE) %>%
+  filter(effect == "fixed")  %>%
+  mutate(`b [95% CI]` = sprintf("%.2f [%.2f, %.2f]", estimate, estimate - (1.96 * std.error), estimate + (1.96 * std.error)),
+         term = gsub("\\(Intercept\\)", "intercept", term),
+         term = gsub("rating_c", "rating", term),
+         term = gsub("instructionregulate", "instruction", term),
+         term = gsub(":rating", " x rating", term)) %>%
+  select(sample, type, term, df, `b [95% CI]`) %>%
+  rename("Sample" = sample,
+         "Signature Type" = type) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+# individual diffs
+```{r, fig.width=6, fig.height=6}
+outliers = data %>%
+  filter(subjectID == "CHIVES1091" & algorithm == "logistic classifier" & instruction == "regulate") %>%
+  group_by(subjectID, algorithm, instruction) %>%
+  mutate(meanPEV = mean(dotSTD, na.rm = TRUE),
+         meanRating = mean(rating, na.rm = TRUE)) %>%
+  select(sample, subjectID, algorithm, meanPEV, meanRating, instruction) %>%
+  unique() 
+
+data %>%
+  filter(!(subjectID == "CHIVES1091" & algorithm == "logistic classifier" & instruction == "regulate")) %>%
+  group_by(subjectID, type, instruction) %>%
+  mutate(meanPEV = mean(dotSTD, na.rm = TRUE),
+         meanRating = mean(rating, na.rm = TRUE)) %>%
+  select(sample, subjectID, type, meanPEV, meanRating, instruction) %>%
+  unique() %>%
+  ggplot(aes(meanPEV, meanRating, color = instruction)) + 
+    geom_point(alpha = .1) +
+    geom_point(data = outliers, color = "black", alpha = .2) +
+    geom_smooth(method = "lm", alpha = .2) +
+    facet_grid(sample~type, scales = "free_x") +
+    scale_color_manual(name = "", values = instruction) +
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    scale_x_continuous(breaks = scales::pretty_breaks(3)) +
+    labs(x = "\nmean standardized regulation PEV", y = "mean craving rating\n") +
+    dc_bw +
+    theme(legend.position = "top",
+          legend.box = "vertical")
+```
+
+# correlations
+```{r, fig.width=10, fig.height=9}
+cors.diffs = data %>%
+  filter(!(subjectID == "CHIVES1091" & algorithm == "logistic classifier" & instruction == "regulate")) %>%
+  filter(!is.na(rating)) %>%
+  group_by(subjectID, type, instruction) %>%
+  mutate(meanPEV = mean(dotSTD, na.rm = TRUE),
+         meanRating = mean(rating, na.rm = TRUE),
+         instruction1 = instruction) %>%
+  select(sample, subjectID, type, meanPEV, meanRating, instruction, instruction1) %>%
+  unique() %>%
+  spread(instruction, meanRating) %>%
+  group_by(subjectID, type) %>%
+  fill(everything(), .direction = "down") %>%
+  fill(everything(), .direction = "up") %>%
+  mutate(success = look - regulate,
+         success.percent = ((look - regulate) / look) * 100) %>%
+  spread(instruction1, meanPEV) %>%
+  mutate(diff = regulate - look)
+
+cors = data %>%
+  filter(!(subjectID == "CHIVES1091" & algorithm == "logistic classifier" & instruction == "regulate")) %>%
+  filter(!is.na(rating)) %>%
+  group_by(subjectID, type, instruction) %>%
+  mutate(`mean PEV` = mean(dotSTD, na.rm = TRUE),
+         `mean rating` = mean(rating, na.rm = TRUE)) %>%
+  left_join(., cors.diffs) %>%
+  gather(variable, value, `mean PEV`, `mean rating`, success, success.percent, diff) %>%
+  select(sample, subjectID, instruction, type, variable, value) %>%
+  unique() %>%
+  unite("instruction", c("variable", "instruction"), sep = " ") %>%
+  filter(!instruction %in% c("success.percent regulate", "success regulate", "diff regulate")) %>%
+  mutate(instruction = ifelse(instruction == "success.percent look", "rating percent change\n(look - regulate / look)",
+                    ifelse(instruction == "success look", "rating difference\n(look - regulate)",
+                    ifelse(instruction == "diff look", "PEV difference\n(regulate - look)", instruction)))) %>%
+  ungroup() %>%
+  select(sample, subjectID, type, instruction, value) %>%
+  group_by(sample, type) %>%
+  do({
+    instruction.spread = spread(., instruction, value)
+    cors = cor(instruction.spread[,-c(1:3)], use = "pairwise.complete.obs") %>%
+      as.data.frame() %>%
+      mutate(type = instruction.spread$type[[1]],
+             sample = instruction.spread$sample[[1]],
+             instruction = colnames(instruction.spread)[-c(1:3)])
+  })
+
+cors %>%
+  reshape2::melt() %>%
+  ggplot(aes(instruction, variable, fill = value)) +
+    geom_tile(color = "white") +
+    scale_fill_gradientn(name = "", colors = c("#3B9AB2", "white", "#F21A00"), limits = c(-1, 1), breaks = c(-1, 0, 1)) + 
+    geom_text(aes(label = round(value, 2)), size = 3, family = "Futura Medium") +
+    facet_grid(sample~type) +
+    labs(x = "", y = "") + 
+    dc_bw +
+    theme(axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1),
+          axis.line = element_blank(),
+          legend.position = "none")
+```
+
+```{r}
+cor_fun = function(data) pmap(var.names, ~ cor.test(data[[.x]], data[[.y]])) %>% 
+  map_df(broom::tidy) %>% 
+  cbind(var.names, .)
+
+cors.spread = data %>%
+  group_by(subjectID, type, instruction) %>%
+  mutate(`mean PEV` = mean(dotSTD, na.rm = TRUE),
+         `mean rating` = mean(rating, na.rm = TRUE)) %>%
+  left_join(., cors.diffs) %>%
+  filter(!subjectID == "CHIVES1091") %>%
+  gather(variable, value, `mean PEV`, `mean rating`, success, success.percent, diff) %>%
+  select(sample, subjectID, instruction, algorithm, type, variable, value) %>%
+  unique() %>%
+  unite("instruction", c("variable", "instruction"), sep = " ") %>%
+  filter(!instruction %in% c("success.percent regulate", "success regulate", "diff regulate")) %>%
+  mutate(instruction = ifelse(instruction == "success.percent look", "rating percent change\n(look - regulate / look)",
+                    ifelse(instruction == "success look", "rating difference\n(look - regulate)",
+                    ifelse(instruction == "diff look", "PEV difference\n(regulate - look)", instruction)))) %>%
+  ungroup() %>%
+  select(sample, subjectID, algorithm, type, instruction, value) %>%
+  ungroup() %>%
+  mutate(instruction = gsub("\n", " ", instruction)) %>%
+  spread(instruction, value) %>%
+  select(-c(subjectID, algorithm)) 
+
+var.names = tidystringdist::tidy_comb_all(names(select(cors.spread, -c(sample, type))))
+
+cors.spread %>%
+  nest(-c(type, sample)) %>%
+  mutate(
+    test = map(data, cor_fun)
+  ) %>% 
+  unnest(test, .drop = TRUE) %>%
+  mutate_if(is.numeric, round, 2) %>%
+  mutate(r = sprintf("%.02f [%.02f, %.02f]", estimate, conf.low, conf.high),
+         sample = factor(sample, levels = c("partial validation", "complete validation")),
+         type = ifelse(V1 %in% c("rating difference (look - regulate)", "rating percent change (look - regulate / look)", "mean rating look", "mean rating regulate") & V2 %in% c("rating difference (look - regulate)", "rating percent change (look - regulate / look)", "mean rating look", "mean rating regulate"), "", type)) %>%
+  select(sample, type, V1, V2, r) %>%
+  rename("Signature Type" = type,
+       "Variable 1" = V1,
+       "Variable 2" = V2,
+       "Sample" = sample) %>%
+  unique() %>%
+  spread(`Variable 1`, r) %>%
+  mutate_if(is.character, funs(ifelse(is.na(.), "–-", .))) %>%
+  select(`Signature Type`, Sample, `Variable 2`, "mean PEV look", "mean PEV regulate", "PEV difference (regulate - look)", "mean rating look", "mean rating regulate", "rating difference (look - regulate)") %>%
+  group_by(Sample, `Signature Type`) %>%
+  bind_rows(expand.grid(`Signature Type` = c("multivariate", "univariate", ""), 
+            Sample = c("partial validation", "complete validation"), 
+            `Variable 2` = "mean PEV look", 
+            `PEV difference (regulate - look)` = "--", 
+            `rating difference (look - regulate)` = "--", 
+            `mean PEV regulate` = "--",
+            `mean PEV look` = "--",
+            `mean rating regulate` = "--", 
+            `mean rating look` = "--")) %>%
+  mutate(`Variable 2` = factor(`Variable 2`, levels = c("mean PEV look", "mean PEV regulate", "PEV difference (regulate - look)", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"))) %>%
+  arrange(Sample, `Variable 2`) %>%
+  arrange(`Signature Type`) %>%
+  mutate(`Variable 2` = sprintf("%s. %s", row_number(), `Variable 2`)) %>%
+  `colnames<-`(c("Signature Type", "Sample", "Variable 1", paste0(1:6))) %>%
+  kable(format = "pandoc")
+
+```
+
+# specification curve analysis
+## partial validation sample
+```{r}
+# set na.action for dredge
+options(na.action = "na.fail")
+
+# tidy data
+data.sca = data %>%
+  filter(sample == "partial validation") %>%
+  select(subjectID, trial, type, dotSTD, rating, instruction) %>%
+  spread(type, dotSTD) %>%
+  na.omit()
+
+# ICC
+model.icc = anova(lm(rating ~ subjectID, data = data.sca))
+model.icc$`Sum Sq`[1] / sum(model.icc$`Sum Sq`)
+
+# run full model
+models = lmer(rating ~ instruction*multivariate + instruction*univariate + (1 | subjectID), data = data.sca)
+
+# run all possible nested models
+models.sca = dredge(models, rank = "AIC", extra = "BIC") %>%
+  select(AIC, delta, BIC, df, logLik, weight, `(Intercept)`, instruction, everything())
+
+# set AIC for null model you want to compare model AIC values to
+null = models.sca %>%
+  arrange(df) %>%
+  filter(instruction == "+" & df == 4)
+
+# tidy for plotting
+plot.data = models.sca %>%
+  arrange(AIC) %>%
+  mutate(specification = row_number(),
+         better.fit = ifelse(AIC == null$AIC, "equal",
+                      ifelse(AIC < null$AIC, "yes", "no")))
+
+order = plot.data %>%
+  gather(variable, value, -c(AIC, delta, BIC, df, logLik, weight, specification, better.fit)) %>%
+  mutate(order = ifelse(grepl("Intercept", variable), 4,
+                 ifelse(grepl("instruction$", variable), 3,
+                 ifelse(grepl("instruction:", variable), 1, 2)))) %>%
+  select(variable, order) %>%
+  unique()
+
+# variables included in model
+variable.names = names(select(plot.data, -starts_with("better"), -specification, -AIC, -BIC, -df, -logLik, -delta, -weight))
+
+# plot top panel
+a = plot.data %>%
+  ggplot(aes(specification, AIC, color = better.fit)) +
+    geom_point(shape = "|", size = 4, alpha = .75) +
+    geom_hline(yintercept = null$AIC, linetype = "dashed", color = "#5BBCD6") +
+    scale_color_manual(values = c("#5BBCD6", "black", "#F43C13")) +
+    scale_x_continuous(breaks = seq(2, 14, 2)) +
+    labs(x = "", y = "AIC\n") +
+    dc_bw +
+    theme(legend.position = "none")
+
+# plot bottom panel
+b = plot.data %>%
+  gather(variable, value, eval(variable.names)) %>%
+  left_join(., order, by = "variable") %>%
+  mutate(value = ifelse(!is.na(value), "|", ""),
+         variable = gsub("\\(Intercept\\)", "intercept", variable),
+         variable = gsub("instruction:", "instruction  x  ", variable)) %>%
+  ggplot(aes(specification, reorder(variable, order), color = better.fit)) +
+    geom_text(aes(label = value), alpha = .75) +
+    scale_color_manual(values = c("#5BBCD6", "black", "#F43C13")) +
+    scale_x_continuous(breaks = seq(2, 14, 2)) +
+    labs(x = "\nspecification number", y = "variables\n") +
+    dc_bw +
+    theme(legend.position = "none")
+
+plot.partial = plot_grid(a, b, ncol = 1, align = "v")
+
+# summarize number of better fitting models
+plot.data %>%
+  gather(variable, value, -c(AIC, delta, BIC, df, logLik, weight, specification, better.fit)) %>%
+  mutate(better.fit = ifelse(better.fit == "yes", 1, 0),
+         var.better = ifelse(better.fit == 1 & !is.na(value), 1, 0),
+         variable = gsub("\\(Intercept\\)", "intercept", variable),
+         variable = gsub("instruction:", "instruction  x  ", variable)) %>%
+  group_by(variable) %>%
+  summarize(sum.var = sum(var.better, na.rm = TRUE),
+            sum.all = sum(better.fit, na.rm = TRUE),
+            percent = (sum.var / sum.all) * 100) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+## complete validation sample
+```{r}
+# set na.action for dredge
+options(na.action = "na.fail")
+
+# tidy data
+data.sca = data %>%
+  filter(sample == "complete validation") %>%
+  select(subjectID, trial, type, dotSTD, rating, instruction) %>%
+  spread(type, dotSTD) %>%
+  na.omit()
+
+# ICC
+model.icc = anova(lm(rating ~ subjectID, data = data.sca))
+model.icc$`Sum Sq`[1] / sum(model.icc$`Sum Sq`)
+
+# run full model
+models = lmer(rating ~ instruction*multivariate + instruction*univariate + (1 | subjectID), data = data.sca)
+
+# run all possible nested models
+models.sca = dredge(models, rank = "AIC", extra = "BIC") %>%
+  select(AIC, delta, BIC, df, logLik, weight, `(Intercept)`, instruction, everything())
+
+# set AIC for null model you want to compare model AIC values to
+null = models.sca %>%
+  arrange(df) %>%
+  filter(instruction == "+" & df == 4)
+
+# tidy for plotting
+plot.data = models.sca %>%
+  arrange(AIC) %>%
+  mutate(specification = row_number(),
+         better.fit = ifelse(AIC == null$AIC, "equal",
+                      ifelse(AIC < null$AIC, "yes", "no")))
+
+order = plot.data %>%
+  gather(variable, value, -c(AIC, delta, BIC, df, logLik, weight, specification, better.fit)) %>%
+  mutate(order = ifelse(grepl("Intercept", variable), 4,
+                 ifelse(grepl("instruction$", variable), 3,
+                 ifelse(grepl("instruction:", variable), 1, 2)))) %>%
+  select(variable, order) %>%
+  unique()
+
+# variables included in model
+variable.names = names(select(plot.data, -starts_with("better"), -specification, -AIC, -BIC, -df, -logLik, -delta, -weight))
+
+# plot top panel
+a = plot.data %>%
+  ggplot(aes(specification, AIC, color = better.fit)) +
+    geom_point(shape = "|", size = 4, alpha = .75) +
+    geom_hline(yintercept = null$AIC, linetype = "dashed", color = "#5BBCD6") +
+    scale_color_manual(values = c("#5BBCD6", "black", "#F43C13")) +
+    scale_x_continuous(breaks = seq(2, 14, 2)) +
+    labs(x = "", y = "AIC\n") +
+    dc_bw +
+    theme(legend.position = "none")
+
+# plot bottom panel
+b = plot.data %>%
+  gather(variable, value, eval(variable.names)) %>%
+  left_join(., order, by = "variable") %>%
+  mutate(value = ifelse(!is.na(value), "|", ""),
+         variable = gsub("\\(Intercept\\)", "intercept", variable),
+         variable = gsub("instruction:", "instruction  x  ", variable)) %>%
+  ggplot(aes(specification, reorder(variable, order), color = better.fit)) +
+    geom_text(aes(label = value), alpha = .75) +
+    scale_color_manual(values = c("#5BBCD6", "black", "#F43C13")) +
+    scale_x_continuous(breaks = seq(2, 14, 2)) +
+    labs(x = "\nspecification number", y = "variables\n") +
+    dc_bw +
+    theme(legend.position = "none",
+          axis.text.y = element_blank())
+
+plot.complete = plot_grid(a, b, ncol = 1, align = "v")
+
+# summarize number of better fitting models
+plot.data %>%
+  gather(variable, value, -c(AIC, delta, BIC, df, logLik, weight, specification, better.fit)) %>%
+  mutate(better.fit = ifelse(better.fit == "yes", 1, 0),
+         var.better = ifelse(better.fit == 1 & !is.na(value), 1, 0),
+         variable = gsub("\\(Intercept\\)", "intercept", variable),
+         variable = gsub("instruction:", "instruction  x  ", variable)) %>%
+  group_by(variable) %>%
+  summarize(sum.var = sum(var.better, na.rm = TRUE),
+            sum.all = sum(better.fit, na.rm = TRUE),
+            percent = (sum.var / sum.all) * 100) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+## combined plot
+```{r, fig.width = 10, fig.height = 4}
+plot_grid(plot.partial, plot.complete, ncol = 2, align = "v", labels = c('A', 'B'), rel_widths = c(.57, .43))
+```
+
+# associations with demographics
+```{r}
+demo = read.csv("../demographics/demographics.csv") %>%
+  filter(!is.na(validation))
+
+cors.data = data %>%
+  group_by(subjectID, type, instruction) %>%
+  mutate(`mean PEV` = mean(dotSTD, na.rm = TRUE),
+         `mean rating` = mean(rating, na.rm = TRUE)) %>%
+  left_join(., cors.diffs) %>%
+  filter(!subjectID == "CHIVES1091") %>%
+  gather(variable, value, `mean PEV`, `mean rating`, success, success.percent, diff) %>%
+  select(sample, subjectID, instruction, algorithm, type, variable, value) %>%
+  unique() %>%
+  unite("instruction", c("variable", "instruction"), sep = " ") %>%
+  filter(!instruction %in% c("success.percent regulate", "success regulate", "diff regulate")) %>%
+  mutate(instruction = ifelse(instruction == "success.percent look", "rating percent change\n(look - regulate / look)",
+                    ifelse(instruction == "success look", "rating difference\n(look - regulate)",
+                    ifelse(instruction == "diff look", "PEV difference\n(regulate - look)", instruction)))) %>%
+  ungroup() %>%
+  select(sample, subjectID, algorithm, type, instruction, value)
+
+demo.spread = cors.data %>%
+  left_join(., demo) %>%
+  ungroup() %>%
+  mutate(instruction = gsub("\n", " ", instruction)) %>%
+  spread(instruction, value)
+
+```
+
+## sex differences
+```{r}
+demo.uni = demo.spread %>%
+  filter(type == "univariate")
+
+demo.multi = demo.spread %>%
+  filter(type == "multivariate")
+
+t.uni = demo.uni %>%
+  select_if(is.numeric) %>%
+  map_df(~ broom::tidy(t.test(.x ~ demo.uni$sex, na.action = "na.omit")), .id = "x") %>%
+  mutate(type = "univariate",
+         y = "sex") %>%
+  select(type, y, everything())
+
+t.multi = demo.multi %>%
+  select_if(is.numeric) %>%
+  map_df(~ broom::tidy(t.test(.x ~ demo.multi$sex, na.action = "na.omit")), .id = "x") %>%
+  mutate(type = "multivariate",
+         y = "sex") %>%
+  select(type, y, everything())
+
+bind_rows(t.uni, t.multi) %>%
+  mutate(type = ifelse(x %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "--", type)) %>%
+  unique() %>%
+  rename("Signature Type" = type,
+         "Variable 1" = y,
+         "Variable 2" = x,
+         "Mfemales" = estimate1,
+         "Mmales" = estimate2) %>%
+  mutate(`Mdiff [95% CI]`= sprintf("%.02f [%.02f, %.02f]", estimate, conf.low, conf.high)) %>%
+  select(`Signature Type`, `Variable 1`, `Variable 2`, `Mdiff [95% CI]`, Mfemales, Mmales) %>%
+  arrange(`Signature Type`) %>%
+  kable(format = "pandoc", digits = 2)
+```
+
+## correlations among variables
+```{r}
+var.names = tidystringdist::tidy_comb_all(names(select(demo.spread, -c(subjectID, sample, algorithm, type, sex, race.ethnicity, neural.signature, validation)))) %>%
+  filter(V1 %in% c("age", "BMI"))
+
+demo.spread %>%
+  nest(-c(type)) %>%
+  mutate(
+    test = map(data, cor_fun)
+  ) %>% 
+  unnest(test, .drop = TRUE) %>%
+  mutate_if(is.numeric, round, 2) %>%
+  mutate(r = sprintf("%.02f [%.02f, %.02f]", estimate, conf.low, conf.high),
+         type = ifelse(V2 %in% c("rating difference (look - regulate)", "rating percent change (look - regulate / look)", "mean rating look", "mean rating regulate", "BMI"), "--", type)) %>%
+  select(type, V1, V2, r) %>%
+    rename("signature type" = type,
+         "variable 1" = V1,
+         "variable 2" = V2) %>%
+  unique() %>%
+  arrange(`signature type`) %>%
+  kable(format = "pandoc")
+```
+
+## associations with sex, age, and BMI
+```{r, fig.width = 12, fig.height = 12}
+a = demo.spread %>%
+  filter(!is.na(sex)) %>%
+  gather(variable, value, -c(subjectID, sample, algorithm, type, sex, race.ethnicity, neural.signature, validation)) %>%
+  mutate(type = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "", type),
+         algorithm = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "", algorithm),
+         variable = gsub("difference", "difference\n", variable),
+         variable = gsub("change", "change\n", variable),
+         variable = factor(variable, levels = c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference\n (look - regulate)", "rating percent change\n (look - regulate / look)", "mean PEV look", "mean PEV regulate", "PEV difference\n (regulate - look)"))) %>%
+  unique() %>%
+  group_by(type, variable, sex) %>%
+  mutate(mean = mean(value, na.rm = TRUE)) %>%
+  ggplot(aes(value, fill = sex)) +
+    geom_density(color = NA, alpha = .7) +
+    geom_vline(aes(xintercept = mean, color = sex), alpha = 1) +
+    facet_wrap(~type + variable, scales = "free", ncol = 4,
+               labeller = function(labels) {
+               labels <- lapply(labels, as.character)
+               list(do.call(paste, c(labels, list(sep = "\n"))))
+             }) +
+    scale_fill_manual(name = "", values = c("#2A5C8C", "#5BBCD6")) + 
+    scale_color_manual(name = "", values = c("#2A5C8C", "#5BBCD6")) + 
+    scale_y_continuous(expand = c(0, 0), breaks = scales::pretty_breaks(3)) +
+    scale_x_continuous(breaks = scales::pretty_breaks(3), expand = expand_scale(mult = c(.05, .04))) +
+    labs(x = "\nvalue", y = "density\n") + 
+    dc_bw +
+    theme(legend.position = "top")
+
+b = demo.spread %>%
+  gather(variable, value, -c(subjectID, sample, algorithm, type, sex, BMI, race.ethnicity, neural.signature, validation)) %>%
+  mutate(type = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "none", type),
+         algorithm = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "none", algorithm),
+         variable = gsub("difference", "difference\n", variable),
+         variable = gsub("change", "change\n", variable),
+         variable = factor(variable, levels = c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference\n (look - regulate)", "rating percent change\n (look - regulate / look)", "mean PEV look", "mean PEV regulate", "PEV difference\n (regulate - look)"))) %>%
+  unique() %>%
+  ggplot(aes(BMI, value, color = type, fill = type)) +
+    geom_point(alpha = .1) +
+    geom_smooth(method = "lm", alpha = .2) +
+    facet_wrap(~variable, scales = "free", ncol = 3) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    scale_color_manual(name = "", values = c(algorithm[1], "grey50", algorithm[2])) +
+    scale_fill_manual(name = "", values = c(algorithm[1], "grey50", algorithm[2])) +
+    scale_size(name = "", range = c(.5,4)) +
+    labs(y = "value\n", x = "\nBMI") + 
+    dc_bw +
+    theme(legend.position = "top",
+          legend.box = "vertical",
+          text = element_text(size = 12),
+          legend.spacing.x = unit(0.1, 'cm'))
+
+c = demo.spread %>%
+  gather(variable, value, -c(subjectID, sample, algorithm, type, sex, age, race.ethnicity, neural.signature, validation)) %>%
+  mutate(type = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "none", type),
+         algorithm = ifelse(variable %in% c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference (look - regulate)", "rating percent change (look - regulate / look)"), "none", algorithm),
+         variable = gsub("difference", "difference\n", variable),
+         variable = gsub("change", "change\n", variable),
+         variable = factor(variable, levels = c("age", "BMI", "mean rating look", "mean rating regulate", "rating difference\n (look - regulate)", "rating percent change\n (look - regulate / look)", "mean PEV look", "mean PEV regulate", "PEV difference\n (regulate - look)"))) %>%
+  unique() %>%
+  ggplot(aes(age, value, color = type, fill = type)) +
+    geom_point(alpha = .1) +
+    geom_smooth(method = "lm", alpha = .2) +
+    facet_wrap(~variable, scales = "free", ncol = 3) + 
+    scale_y_continuous(breaks = scales::pretty_breaks(3)) +
+    scale_color_manual(name = "", values = c(algorithm[1], "grey50", algorithm[2])) +
+    scale_fill_manual(name = "", values = c(algorithm[1], "grey50", algorithm[2])) +
+    scale_size(name = "", range = c(.5,4)) +
+    labs(y = "value\n", x = "\nage") + 
+    dc_bw +
+    theme(legend.position = "top",
+          legend.box = "vertical",
+          text = element_text(size = 12),
+          legend.spacing.x = unit(0.1, 'cm'))
+
+bottom_row = plot_grid(b, c, labels = c('B', 'C'), align = 'h', rel_widths = c(1, 1))
+plot_grid(a, bottom_row, labels = c('A', ''), ncol = 1, rel_heights = c(1, 1))
+```
